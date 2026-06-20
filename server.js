@@ -34,7 +34,7 @@ uploadDirs.forEach(dir => {
 });
 
 // =============================================
-// SESSION STORE – SQLite (works locally and on Render)
+// SESSION STORE – SQLite (works everywhere)
 // =============================================
 const sessionStore = new SQLiteStore({ db: 'sessions.db', concurrentDB: true });
 
@@ -45,7 +45,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' ? true : false, // local HTTP works
+    secure: process.env.NODE_ENV === 'production' ? true : false,
     sameSite: 'lax',
     maxAge: 30 * 24 * 60 * 60 * 1000
   }
@@ -69,7 +69,8 @@ app.use(async (req, res, next) => {
       if (user) {
         res.locals.user = user;
         res.locals.isLoggedIn = true;
-        res.locals.isAdmin = user.is_admin === 1;
+        // ✅ convert to boolean for PostgreSQL compatibility
+        res.locals.isAdmin = user.is_admin === 1 || user.is_admin === true;
       }
     } catch (error) {
       console.error('Session user error:', error);
