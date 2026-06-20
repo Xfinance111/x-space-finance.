@@ -1,0 +1,112 @@
+<!-- Overlay (for mobile) -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+<!-- Sidebar -->
+<aside id="dashboardSidebar" class="fixed top-0 left-0 h-full w-64 bg-white border-r border-slate-200 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
+  <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+    <a href="/dashboard" class="text-xl font-bold text-slate-800">XSpace<span class="text-blue-600">Finance</span></a>
+    <!-- Close button (mobile only) -->
+    <button id="sidebarClose" class="lg:hidden p-1 rounded hover:bg-slate-100">
+      <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <nav class="p-3 space-y-1">
+    <!-- ========== YOUR EXISTING LINKS (copy them here) ========== -->
+    <!-- Overview -->
+    <p class="sidebar-section-label">Overview</p>
+    <a href="/dashboard" class="sidebar-link <%= title === 'Dashboard' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+    
+    <!-- Investing -->
+    <p class="sidebar-section-label mt-4">Investing</p>
+    <a href="/dashboard/investments" class="sidebar-link <%= title === 'My Investments' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
+      </svg>
+      <span>My Investments</span>
+    </a>
+    <a href="/dashboard/active-plans" class="sidebar-link <%= title === 'Active Plans' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <span>Active Plans</span>
+    </a>
+    <a href="/dashboard/new-investment" class="sidebar-link <%= title === 'New Investment' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 4.5v15m7.5-7.5h-15"/>
+      </svg>
+      <span>New Investment</span>
+    </a>
+    <a href="/dashboard/calculator" class="sidebar-link <%= title === 'Calculator' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/>
+      </svg>
+      <span>Calculator</span>
+    </a>
+    
+    <!-- Funds -->
+    <p class="sidebar-section-label mt-4">Funds</p>
+    <a href="/dashboard/deposits" class="sidebar-link <%= title === 'Deposits' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+      </svg>
+      <span>Deposits</span>
+    </a>
+    <a href="/dashboard/withdrawals" class="sidebar-link <%= title === 'Withdrawals' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
+      </svg>
+      <span>Withdrawals</span>
+    </a>
+    <a href="/dashboard/transactions" class="sidebar-link <%= title === 'Transactions' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+      </svg>
+      <span>Transactions</span>
+    </a>
+    
+    <!-- Account -->
+    <p class="sidebar-section-label mt-4">Account</p>
+    <a href="/dashboard/profile" class="sidebar-link <%= title === 'Profile' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+    <a href="/dashboard/notifications" class="sidebar-link <%= title === 'Notifications' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+      </svg>
+      <span>Notifications</span>
+    </a>
+    <a href="/dashboard/activity-log" class="sidebar-link <%= title === 'Activity Log' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <span>Activity Log</span>
+    </a>
+    
+    <div class="border-t border-slate-200 my-4"></div>
+    
+    <a href="/dashboard/kyc" class="sidebar-link <%= title === 'KYC Verification' ? 'active' : '' %>">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"/>
+      </svg>
+      <span>KYC Verification</span>
+    </a>
+
+    <!-- Sign Out -->
+    <a href="/logout" class="sidebar-link text-red-500 hover:bg-red-50">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+      </svg>
+      <span>Sign Out</span>
+    </a>
+  </nav>
+</aside>

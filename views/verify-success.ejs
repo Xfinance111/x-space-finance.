@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verified - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white text-slate-900">
+
+  <nav class="bg-white/95 backdrop-blur-sm border-b border-slate-200/80 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-800 via-blue-700 to-slate-800 bg-clip-text text-transparent">
+          XSpaceFinance
+        </a>
+        <div class="flex items-center gap-3">
+          <a href="/signin" class="text-sm font-medium text-slate-600 hover:text-slate-900">Sign In</a>
+          <a href="/register" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 bg-slate-50/60">
+    <div class="w-full max-w-[420px] px-4">
+
+      <div class="text-center mb-7">
+        <div class="mx-auto w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+          </svg>
+        </div>
+        <h1 class="text-[22px] font-semibold text-slate-900 tracking-tight">Email Verified!</h1>
+        <p class="mt-1.5 text-[13px] text-slate-400 max-w-[340px] mx-auto leading-relaxed">
+          <%= typeof message !== 'undefined' ? message : 'Your email has been successfully verified.' %>
+        </p>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-xl shadow-sm">
+        <div class="px-6 sm:px-8 py-7 sm:py-8">
+          <a href="/signin" class="block w-full text-center text-[13px] font-medium text-white bg-slate-800 hover:bg-slate-900 rounded-lg px-4 py-2.5 transition-colors">
+            Proceed to Login
+          </a>
+          <p class="mt-4 text-center text-[12px] text-slate-400">
+            Redirecting to login in <span id="countdown" class="font-semibold text-slate-600">5</span> seconds...
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    let seconds = 5;
+    const el = document.getElementById('countdown');
+    const timer = setInterval(function() {
+      seconds--;
+      el.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(timer);
+        window.location.href = '/signin';
+      }
+    }, 1000);
+  </script>
+
+  <footer class="bg-slate-950 text-slate-400 py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+      <p>&copy; 2026 XSpaceFinance. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

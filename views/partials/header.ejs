@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="description" content="XSpaceFinance - Professional investment platform with fixed-duration plans and transparent compound returns">
+  <meta name="keywords" content="investment, trading, forex, crypto, ROI, compound interest">
+  <meta name="author" content="XSpaceFinance">
+
+  <!-- ========== OPEN GRAPH (link previews) ========== -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="XSpaceFinance – Structured growth. Transparent returns.">
+  <meta property="og:description" content="Fixed-duration investment plans with clearly stated compound returns. Serving investors in the US, UK, and Canada.">
+  <meta property="og:image" content="<%= process.env.BASE_URL || 'https://xspacefinance.onrender.com' %>/og-image.png">
+  <meta property="og:url" content="<%= process.env.BASE_URL || 'https://xspacefinance.onrender.com' %>">
+  <meta property="og:site_name" content="XSpaceFinance">
+  <meta property="og:locale" content="en_US">
+
+  <!-- ========== TWITTER CARD ========== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="XSpaceFinance – Structured growth. Transparent returns.">
+  <meta name="twitter:description" content="Fixed-duration investment plans with clearly stated compound returns. Serving investors in the US, UK, and Canada.">
+  <meta name="twitter:image" content="<%= process.env.BASE_URL || 'https://xspacefinance.onrender.com' %>/og-image.png">
+
+  <!-- ========== FAVICONS ========== -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <title><%= typeof title !== 'undefined' ? title : 'XSpaceFinance' %></title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+    .font-display { font-family: 'Inter', sans-serif; }
+    .dark { background: #0f172a; }
+    .bg-background { background: #0f172a; }
+    .text-foreground { color: white; }
+    .bg-card { background: #1e293b; }
+    .border-border { border-color: #334155; }
+    .text-muted-foreground { color: #94a3b8; }
+    .bg-accent { background: #3b82f6; }
+    .text-accent { color: #3b82f6; }
+    .bg-secondary { background: #1e293b; }
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+    <div class="flex items-center gap-3">
+      <!-- Logo from public/logo.png -->
+      <a class="flex items-center gap-2" href="/">
+        <img src="/logo.png" alt="XSpaceFinance Logo" class="h-9 w-auto object-contain" onerror="this.style.display='none'">
+        <span class="font-display text-xl font-extrabold tracking-tight uppercase text-white">
+          XSpace<span class="text-blue-600">Finance</span>
+        </span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a class="text-sm font-medium text-slate-400 hover:text-white transition" href="/">Home</a>
+        <a href="/about" class="text-sm font-medium text-slate-400 hover:text-white transition">About</a>
+        <a href="/plans" class="text-sm font-medium text-slate-400 hover:text-white transition">Plans</a>
+        <a href="/calculator" class="text-sm font-medium text-slate-400 hover:text-white transition">Calculator</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/signin" class="text-sm font-medium text-slate-400 hover:text-blue-600 transition hidden sm:inline">Sign In</a>
+      <a href="/register" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition">Get Started</a>
+    </div>
+  </div>
+</nav>

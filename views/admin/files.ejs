@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+  <div class="flex min-h-screen">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="flex-1 p-8 ml-64">
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+            </svg>
+            Uploaded Files
+          </h1>
+          <p class="text-sm text-slate-500 mt-1">Manage all uploaded documents and proof files</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full font-medium">
+            <%= files ? files.length : 0 %> total files
+          </span>
+        </div>
+      </div>
+
+      <!-- Files Table -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">File Name</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Preview</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <% if (files && files.length > 0) { %>
+                <% files.forEach(f => { %>
+                  <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 text-sm font-medium text-slate-800 truncate max-w-[200px]">
+                      <%= f.name %>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                        <%= f.type === 'kyc' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' %>">
+                        <%= f.type === 'kyc' ? '🪪 KYC' : '💳 Deposit' %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <a href="<%= f.path %>" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium flex items-center gap-1">
+                        View
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+                        </svg>
+                      </a>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <form action="/admin/files/delete" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this file?')">
+                        <input type="hidden" name="filepath" value="<%= f.path %>">
+                        <button type="submit" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-lg text-sm font-medium transition flex items-center gap-1 ml-auto">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                          </svg>
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center gap-3">
+                      <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                      </svg>
+                      <p class="text-slate-500 text-sm">No uploaded files yet.</p>
+                      <p class="text-xs text-slate-400">Files will appear here when users upload KYC documents or deposit proofs.</p>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <!-- Table Footer -->
+        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
+          <p class="text-xs text-slate-500">
+            Showing <span class="font-medium"><%= files ? files.length : 0 %></span> files
+          </p>
+          <p class="text-xs text-slate-400">
+            <span class="font-medium"><%= files ? files.filter(f => f.type === 'kyc').length : 0 %></span> KYC · 
+            <span class="font-medium"><%= files ? files.filter(f => f.type === 'deposit').length : 0 %></span> Deposit proofs
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

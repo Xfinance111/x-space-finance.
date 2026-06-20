@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+  
+  <!-- Sidebar -->
+  <div class="flex">
+    <div class="w-64 bg-slate-900 border-r border-slate-800 min-h-screen p-6 fixed">
+      <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-700">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"><span class="text-white font-bold text-xl">X</span></div>
+        <div><h1 class="text-xl font-bold">XSpace<span class="text-blue-500">Admin</span></h1><p class="text-xs text-slate-400">Investment Platform</p></div>
+      </div>
+      <div class="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center"><span class="text-white font-bold text-lg">A</span></div>
+          <div class="flex-1"><p class="font-semibold text-white"><%= typeof admin !== 'undefined' && admin ? admin.first_name : 'Admin' %> <%= typeof admin !== 'undefined' && admin ? admin.last_name : 'User' %></p><p class="text-xs text-slate-400">Administrator</p></div>
+        </div>
+      </div>
+      <nav class="space-y-1">
+        <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">📊 Dashboard</a>
+        <a href="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">👥 Users</a>
+        <a href="/admin/deposits" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">💰 Deposits</a>
+        <a href="/admin/withdrawals" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">💸 Withdrawals</a>
+        <a href="/admin/plans" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">📈 Plans</a>
+        <a href="/admin/kyc" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">🪪 KYC</a>
+        <a href="/admin/logs" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800">📋 Logs</a>
+        <div class="pt-4 mt-4 border-t border-slate-700"><a href="/logout" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10">🚪 Logout</a></div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64 flex-1 p-6">
+      <!-- Header -->
+      <div class="mb-6">
+        <a href="/admin/users" class="text-sm text-blue-400 hover:text-blue-300 mb-2 inline-flex items-center gap-1">← Back to Users</a>
+        <h1 class="text-2xl font-bold">User Management</h1>
+        <p class="text-slate-400 text-sm">View and manage user account</p>
+      </div>
+
+      <!-- User Info Card -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-xl font-bold"><%= targetUser.first_name %> <%= targetUser.last_name %></h2>
+            <p class="text-slate-400"><%= targetUser.email %></p>
+            <p class="text-sm text-slate-500 mt-1">Member since: <%= new Date(targetUser.created_at).toLocaleDateString() %></p>
+            <p class="text-sm text-slate-500 mt-1">Last Login: <%= targetUser.last_login ? new Date(targetUser.last_login).toLocaleString() : 'Never' %></p>
+          </div>
+          <div class="flex gap-2">
+            <span class="px-3 py-1 rounded-full text-xs <%= targetUser.is_banned ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400' %>"><%= targetUser.is_banned ? 'Banned' : 'Active' %></span>
+            <span class="px-3 py-1 rounded-full text-xs <%= targetUser.is_admin ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-600 text-slate-400' %>"><%= targetUser.is_admin ? 'Admin' : 'User' %></span>
+            <span class="px-3 py-1 rounded-full text-xs <%= targetUser.kyc_status === 'approved' ? 'bg-green-500/20 text-green-400' : targetUser.kyc_status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400' %>">KYC: <%= targetUser.kyc_status || 'pending' %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+          <p class="text-slate-400 text-sm">Current Balance</p>
+          <p class="text-2xl font-bold text-white"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(targetUser.balance) %></p>
+        </div>
+        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+          <p class="text-slate-400 text-sm">Total Deposits</p>
+          <p class="text-2xl font-bold text-green-400">$<%= (typeof deposits !== 'undefined' && deposits.length ? deposits.reduce((sum, d) => sum + (d.status === 'approved' ? d.amount : 0), 0) : 0).toLocaleString() %></p>
+        </div>
+        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+          <p class="text-slate-400 text-sm">Total Withdrawals</p>
+          <p class="text-2xl font-bold text-red-400">$<%= (typeof withdrawals !== 'undefined' && withdrawals.length ? withdrawals.reduce((sum, w) => sum + (w.status === 'completed' ? w.amount : 0), 0) : 0).toLocaleString() %></p>
+        </div>
+        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+          <p class="text-slate-400 text-sm">Referral Code</p>
+          <p class="text-xl font-bold font-mono text-blue-400"><%= targetUser.referral_code %></p>
+        </div>
+      </div>
+
+      <!-- Adjust Balance Form -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
+        <h2 class="text-lg font-bold mb-4">💰 Adjust Balance</h2>
+        <form method="POST" action="/admin/user/<%= targetUser.id %>/balance">
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Amount</label>
+              <input type="number" name="amount" id="amountDelta" step="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" required>
+              <p class="text-xs text-slate-400 mt-1">Positive = Credit, Negative = Debit</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Reason (will appear as transaction description)</label>
+              <input type="text" name="reason" id="reasonInput" placeholder="e.g., Bonus, TAX, Investment" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2">
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700">Apply Change</button>
+            </div>
+          </div>
+          <div class="mt-3 p-2 bg-slate-700/30 rounded-lg text-center">
+            <span class="text-slate-400">Current: </span><span class="font-bold text-white" id="currentBalanceDisplay"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(targetUser.balance) %></span>
+            <span class="text-slate-400 mx-2">→</span>
+            <span class="text-slate-400">New: </span><span class="font-bold text-green-400" id="newBalanceDisplay"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(targetUser.balance) %></span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid md:grid-cols-3 gap-4 mb-6">
+        <form method="POST" action="/admin/user/<%= targetUser.id %>/toggle-ban">
+          <button type="submit" class="w-full py-3 <%= targetUser.is_banned ? 'bg-green-600' : 'bg-red-600' %> rounded-lg font-semibold"><%= targetUser.is_banned ? 'Unban User' : 'Ban User' %></button>
+        </form>
+        <form method="POST" action="/admin/user/<%= targetUser.id %>/toggle-admin">
+          <button type="submit" class="w-full py-3 <%= targetUser.is_admin ? 'bg-yellow-600' : 'bg-purple-600' %> rounded-lg font-semibold"><%= targetUser.is_admin ? 'Remove Admin' : 'Make Admin' %></button>
+        </form>
+        <form method="POST" action="/admin/user/<%= targetUser.id %>/kyc-approve">
+          <button type="submit" class="w-full py-3 bg-green-600 rounded-lg font-semibold">Approve KYC</button>
+        </form>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-4">
+        <div class="flex flex-wrap border-b border-slate-700">
+          <button class="tab-btn active px-5 py-2 text-sm font-medium text-blue-400 border-b-2 border-blue-400" data-tab="investments">Investments</button>
+          <button class="tab-btn px-5 py-2 text-sm font-medium text-slate-400 hover:text-white" data-tab="deposits">Deposits</button>
+          <button class="tab-btn px-5 py-2 text-sm font-medium text-slate-400 hover:text-white" data-tab="withdrawals">Withdrawals</button>
+          <button class="tab-btn px-5 py-2 text-sm font-medium text-slate-400 hover:text-white" data-tab="transactions">Transactions</button>
+        </div>
+      </div>
+
+      <!-- Tab 1: Investments -->
+      <div id="tab-investments" class="tab-content">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-700"><h2 class="font-bold text-lg">All Investments</h2></div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-700/50">
+                <tr><th class="px-6 py-3 text-left text-xs">Plan</th><th class="px-6 py-3 text-right text-xs">Amount</th><th class="px-6 py-3 text-right text-xs">Current Value</th><th class="px-6 py-3 text-left text-xs">Status</th><th class="px-6 py-3 text-left text-xs">Start</th><th class="px-6 py-3 text-left text-xs">End</th></tr>
+              </thead>
+              <tbody>
+                <% if(typeof investments !== 'undefined' && investments.length > 0) { 
+                  investments.forEach(function(inv) { %>
+                  <tr class="border-t border-slate-700">
+                    <td class="px-6 py-4"><%= inv.plan_name %></td>
+                    <td class="px-6 py-4 text-right font-mono"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(inv.amount) %></td>
+                    <td class="px-6 py-4 text-right font-mono text-green-400"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(inv.current_value || inv.amount) %></td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs <%= inv.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-slate-600 text-slate-400' %>"><%= inv.status %></span></td>
+                    <td class="px-6 py-4 text-sm"><%= new Date(inv.start_date).toLocaleDateString() %></td>
+                    <td class="px-6 py-4 text-sm"><%= new Date(inv.end_date).toLocaleDateString() %></td>
+                  </tr>
+                <% }); 
+                } else { %>
+                  <tr class="border-t border-slate-700"><td colspan="6" class="px-6 py-8 text-center text-slate-400">No investments found</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Deposits -->
+      <div id="tab-deposits" class="tab-content hidden">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-700"><h2 class="font-bold text-lg">Deposit History</h2></div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-700/50">
+                <tr><th class="px-6 py-3 text-left text-xs">Date</th><th class="px-6 py-3 text-right text-xs">Amount</th><th class="px-6 py-3 text-left text-xs">Method</th><th class="px-6 py-3 text-center text-xs">Status</th></tr>
+              </thead>
+              <tbody>
+                <% if(typeof deposits !== 'undefined' && deposits.length > 0) { 
+                  deposits.forEach(function(d) { %>
+                  <tr class="border-t border-slate-700">
+                    <td class="px-6 py-4 text-sm"><%= new Date(d.created_at).toLocaleString() %><td>
+                    <td class="px-6 py-4 text-right font-mono"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(d.amount) %></td>
+                    <td class="px-6 py-4"><%= d.method || 'Crypto' %></td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded text-xs <%= d.status === 'approved' ? 'bg-green-500/20 text-green-400' : d.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400' %>"><%= d.status %></span></td>
+                  </td>
+                <% }); 
+                } else { %>
+                  <tr class="border-t border-slate-700"><td colspan="4" class="px-6 py-8 text-center text-slate-400">No deposits found</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Withdrawals -->
+      <div id="tab-withdrawals" class="tab-content hidden">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-700"><h2 class="font-bold text-lg">Withdrawal History</h2></div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-700/50">
+                <tr><th class="px-6 py-3 text-left text-xs">Date</th><th class="px-6 py-3 text-right text-xs">Amount</th><th class="px-6 py-3 text-left text-xs">Method</th><th class="px-6 py-3 text-left text-xs">Address</th><th class="px-6 py-3 text-center text-xs">Status</th></tr>
+              </thead>
+              <tbody>
+                <% if(typeof withdrawals !== 'undefined' && withdrawals.length > 0) { 
+                  withdrawals.forEach(function(w) { %>
+                  <tr class="border-t border-slate-700">
+                    <td class="px-6 py-4 text-sm"><%= new Date(w.created_at).toLocaleString() %></td>
+                    <td class="px-6 py-4 text-right font-mono"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(w.amount) %></td>
+                    <td class="px-6 py-4"><%= w.method || 'Crypto' %></td>
+                    <td class="px-6 py-4 font-mono text-xs truncate max-w-[150px]"><%= w.address %></td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded text-xs <%= w.status === 'completed' ? 'bg-green-500/20 text-green-400' : w.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400' %>"><%= w.status %></span></td>
+                  </tr>
+                <% }); 
+                } else { %>
+                  <tr class="border-t border-slate-700"><td colspan="5" class="px-6 py-8 text-center text-slate-400">No withdrawals found</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Transactions -->
+      <div id="tab-transactions" class="tab-content hidden">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-700"><h2 class="font-bold text-lg">Transaction History</h2></div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-700/50">
+                <tr><th class="px-6 py-3 text-left text-xs">Date</th><th class="px-6 py-3 text-left text-xs">Type</th><th class="px-6 py-3 text-left text-xs">Description</th><th class="px-6 py-3 text-right text-xs">Amount</th><th class="px-6 py-3 text-right text-xs">Balance</th></tr>
+              </thead>
+              <tbody>
+                <% if(typeof transactions !== 'undefined' && transactions.length > 0) { 
+                  transactions.slice(0, 50).forEach(function(tx) { %>
+                  <tr class="border-t border-slate-700">
+                    <td class="px-6 py-4 text-sm"><%= new Date(tx.created_at).toLocaleString() %><tr>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs bg-slate-700"><%= tx.type %></span></td>
+                    <td class="px-6 py-4"><%= tx.description || '—' %></td>
+                    <td class="px-6 py-4 text-right font-mono <%= tx.amount > 0 ? 'text-green-400' : 'text-red-400' %>"><%= tx.amount > 0 ? '+' : '' %><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(tx.amount) %></td>
+                    <td class="px-6 py-4 text-right font-mono"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: targetUser.currency || 'USD' }).format(tx.balance_after) %></td>
+                  </tr>
+                <% }); 
+                } else { %>
+                  <tr class="border-t border-slate-700"><td colspan="5" class="px-6 py-8 text-center text-slate-400">No transactions found</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Balance preview
+    document.getElementById('amountDelta')?.addEventListener('input', function() {
+      let current = <%= targetUser.balance %>;
+      let delta = parseFloat(this.value) || 0;
+      let newBalance = current + delta;
+      document.getElementById('newBalanceDisplay').innerHTML = '$' + newBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-blue-400', 'border-blue-400'));
+        this.classList.add('active', 'text-blue-400', 'border-b-2', 'border-blue-400');
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI Calculator — Project Your Returns | XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; }
+    .font-display { font-family: 'Inter', sans-serif; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+    <div class="flex items-center gap-8">
+      <a href="/" class="font-display text-xl font-extrabold tracking-tight uppercase text-white">XSpace<span class="text-blue-500">Finance</span></a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-sm font-medium text-slate-400 hover:text-white transition">Home</a>
+        <a href="/about" class="text-sm font-medium text-slate-400 hover:text-white transition">About</a>
+        <a href="/plans" class="text-sm font-medium text-slate-400 hover:text-white transition">Plans</a>
+        <a href="/calculator" class="text-sm font-medium text-white transition active">Calculator</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/signin" class="text-sm font-medium text-slate-400 hover:text-blue-500 transition hidden sm:inline">Sign In</a>
+      <a href="/register" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="bg-white overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+      <div class="lg:col-span-5 xl:col-span-5">
+        <div class="flex items-center gap-2.5">
+          <div class="h-px w-8 bg-blue-500"></div>
+          <p class="text-[11px] font-medium text-blue-600 tracking-[0.2em] uppercase">Investment Calculator</p>
+        </div>
+        <h1 class="mt-7 text-[1.625rem] sm:text-[2rem] lg:text-[2.25rem] font-bold text-slate-900 leading-[1.2] tracking-tight">
+          Project your returns with published plan&nbsp;rates.
+        </h1>
+        <p class="mt-5 text-[0.9375rem] text-slate-600 leading-[1.75] max-w-md">
+          Enter any amount, select a plan, and see projected growth. The calculation uses the plan's stated ROI over its full duration.
+        </p>
+        <div class="mt-9 flex flex-col sm:flex-row gap-3.5">
+          <a href="#calculator-section" class="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm">
+            <svg class="mr-2 w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/></svg>
+            Calculate Returns
+          </a>
+          <a href="/plans" class="inline-flex items-center justify-center border border-slate-300 text-slate-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">View Investment Plans</a>
+        </div>
+        <div class="mt-10 pt-6 border-t border-slate-200">
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5">
+            <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> Transparent ROI</span>
+            <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> Duration-based</span>
+            <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> Matches live plans</span>
+          </div>
+        </div>
+      </div>
+      <!-- Right animated chart (same as before) -->
+      <div class="hidden lg:block lg:col-span-7 xl:col-span-7">
+        <div class="relative">
+          <svg class="w-full h-auto" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="calcAreaFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.06"/>
+                <stop offset="100%" stop-color="#94a3b8" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g stroke="#475569" stroke-width="0.3" opacity="0.08">
+              <line x1="55" y1="40" x2="500" y2="40"/><line x1="55" y1="68" x2="500" y2="68"/>
+              <line x1="55" y1="96" x2="500" y2="96"/><line x1="55" y1="124" x2="500" y2="124"/>
+              <line x1="55" y1="152" x2="500" y2="152"/><line x1="55" y1="180" x2="500" y2="180"/>
+              <line x1="55" y1="208" x2="500" y2="208"/><line x1="55" y1="236" x2="500" y2="236"/>
+              <line x1="55" y1="264" x2="500" y2="264"/><line x1="55" y1="40" x2="55" y2="264"/>
+              <line x1="118.5" y1="40" x2="118.5" y2="264"/><line x1="182" y1="40" x2="182" y2="264"/>
+              <line x1="245.5" y1="40" x2="245.5" y2="264"/><line x1="309" y1="40" x2="309" y2="264"/>
+              <line x1="372.5" y1="40" x2="372.5" y2="264"/><line x1="436" y1="40" x2="436" y2="264"/>
+              <line x1="499.5" y1="40" x2="499.5" y2="264"/>
+            </g>
+            <line x1="55" y1="264" x2="500" y2="264" stroke="#475569" stroke-width="0.6" opacity="0.25"/>
+            <line x1="55" y1="40"  x2="55"  y2="264" stroke="#475569" stroke-width="0.6" opacity="0.25"/>
+            <g fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="end" opacity="0.35">
+              <text x="50" y="268">$0</text><text x="50" y="212">$5K</text>
+              <text x="50" y="156">$10K</text><text x="50" y="100">$15K</text><text x="50" y="44">$20K</text>
+            </g>
+            <g fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.35">
+              <text x="55"  y="278">0</text><text x="118" y="278">6</text><text x="182" y="278">12</text>
+              <text x="245" y="278">24</text><text x="370" y="278">36</text><text x="500" y="278">60mo</text>
+            </g>
+            <line x1="55" y1="152" x2="500" y2="152" stroke="#64748b" stroke-width="0.5" stroke-dasharray="4,5" opacity="0.15"/>
+            <path d="M55,152 C62,151 68,150 75,149 C88,147 98,145 118,143 C140,139 160,134 182,124 C210,112 230,98 245,92 C270,80 310,65 370,52 C420,38 470,28 500,22" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.50" class="calc-curve-draw"/>
+            <path d="M55,152 C62,151 68,150 75,149 C88,147 98,145 118,143 C140,139 160,134 182,124 C210,112 230,98 245,92 C270,80 310,65 370,52 C420,38 470,28 500,22 L500,264 L55,264Z" fill="url(#calcAreaFill)" class="calc-area-reveal"/>
+            <circle cx="65" cy="150" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:0.2s"/>
+            <circle cx="118" cy="143" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:0.4s"/>
+            <circle cx="182" cy="124" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:0.6s"/>
+            <circle cx="245" cy="92" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:0.8s"/>
+            <circle cx="370" cy="52" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:1.0s"/>
+            <circle cx="500" cy="22" r="3" fill="#94a3b8" opacity="0.55" class="calc-node" style="animation-delay:1.2s"/>
+            <g class="calc-el-fade" style="animation-delay:1.4s">
+              <rect x="250" y="76" width="72" height="32" rx="5" fill="#0f172a" stroke="#334155" stroke-width="0.6"/>
+              <text x="260" y="88" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif" opacity="0.65">24-mo return</text>
+              <text x="260" y="100" fill="#e2e8f0" font-size="9" font-family="Inter,monospace" font-weight="600">$13,949</text>
+            </g>
+            <g class="calc-el-fade" style="animation-delay:1.8s">
+              <rect x="438" y="6" width="56" height="32" rx="5" fill="#0f172a" stroke="#334155" stroke-width="0.6"/>
+              <text x="446" y="18" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif" opacity="0.65">60-mo</text>
+              <text x="446" y="30" fill="#e2e8f0" font-size="9" font-family="Inter,monospace" font-weight="600">$25,931</text>
+            </g>
+            <text x="277" y="294" fill="#64748b" font-size="8" font-family="Inter,sans-serif" text-anchor="middle" opacity="0.20">Duration (months)</text>
+            <text x="16" y="152" fill="#64748b" font-size="8" font-family="Inter,sans-serif" text-anchor="middle" opacity="0.20" transform="rotate(-90,16,152)">Portfolio Value</text>
+            <text x="498" y="294" fill="#475569" font-size="7" font-family="'Courier New',monospace" text-anchor="end" opacity="0.16">A = P × (1 + r)ⁿ</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Calculator Section -->
+<section id="calculator-section" class="py-16 lg:py-24 bg-slate-950">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      
+      <!-- Form -->
+      <div class="bg-slate-900 rounded-2xl border border-slate-800 p-8">
+        <h2 class="text-xl font-bold text-white mb-1">Enter Details</h2>
+        <p class="text-sm text-slate-400 mb-8">Choose a plan and investment amount to see projected returns.</p>
+        <div class="space-y-6">
+          <div>
+            <label for="calc-plan" class="block text-sm font-medium text-slate-300 mb-2">Select Plan</label>
+            <select id="calc-plan" class="w-full border border-slate-700 rounded-xl px-4 py-3 text-white bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              <option value="1" data-min="100" data-max="2221" data-rate="200" data-days="30" data-duration="1 month" data-name="108 Circle">108 Circle (1 month · 200% ROI)</option>
+              <option value="2" data-min="2222" data-max="7999" data-rate="200" data-days="30" data-duration="1 month" data-name="2222 Investment">2222 Investment (1 month · 200% ROI)</option>
+              <option value="3" data-min="8000" data-max="14999" data-rate="300" data-days="30" data-duration="1 month" data-name="8888 Investment">8888 Investment (1 month · 300% ROI)</option>
+              <option value="4" data-min="15000" data-max="19999" data-rate="350" data-days="30" data-duration="1 month" data-name="Tier 3 Investment">Tier 3 Investment (1 month · 350% ROI)</option>
+              <option value="5" data-min="20000" data-max="999999999" data-rate="750" data-days="14" data-duration="2 weeks" data-name="Bitcoin Elite Group">Bitcoin Elite Group (2 weeks · 750% ROI)</option>
+            </select>
+          </div>
+          <div>
+            <label for="calc-amount" class="block text-sm font-medium text-slate-300 mb-2">Investment Amount ($)</label>
+            <input type="number" id="calc-amount" class="w-full border border-slate-700 rounded-xl px-4 py-3 text-white bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Enter amount" min="100" step="100" value="10000">
+            <p id="calc-range" class="mt-1.5 text-xs text-slate-500"></p>
+          </div>
+          <button id="calc-submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">Calculate Returns</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="calc-results" class="bg-slate-900 rounded-2xl border border-slate-800 p-8 hidden">
+        <h2 class="text-xl font-bold text-white mb-6">Projected Returns</h2>
+        <div class="space-y-0">
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Plan</span><span id="res-plan" class="text-sm font-semibold text-white"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Principal</span><span id="res-principal" class="text-sm font-semibold text-white"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Duration</span><span id="res-duration" class="text-sm font-semibold text-white"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Total ROI</span><span id="res-rate" class="text-sm font-semibold text-green-500"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Total Return</span><span id="res-total" class="text-lg font-bold text-green-500"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Profit</span><span id="res-profit" class="text-sm font-bold text-green-500"></span></div>
+          <div class="flex justify-between items-center py-3.5 border-b border-slate-800"><span class="text-sm text-slate-400">Effective ROI</span><span id="res-roi" class="text-sm font-semibold text-green-500"></span></div>
+          <div class="flex justify-between items-center py-3.5"><span class="text-sm text-slate-400">Maturity Date</span><span id="res-maturity" class="text-sm font-semibold text-white"></span></div>
+        </div>
+        <div class="mt-8"><a href="/register" class="block w-full text-center bg-blue-600 text-white py-3.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">Start Investing Now</a></div>
+      </div>
+
+      <div id="calc-placeholder" class="bg-slate-800 rounded-2xl border border-dashed border-slate-700 p-8 flex items-center justify-center">
+        <div class="text-center"><svg class="mx-auto w-10 h-10 text-slate-500 mb-4" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/></svg><p class="text-sm text-slate-400">Select a plan and enter an amount to see your projected returns.</p></div>
+      </div>
+    </div>
+    <p class="mt-10 text-center text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed">Projected returns are based on stated ROI and are not guaranteed. All investments carry risk, including potential loss of principal. <a href="/risk" class="text-blue-500 hover:underline">Read full risk disclosure</a>.</p>
+  </div>
+</section>
+
+<!-- All Plans at a Glance – Hardcoded example values -->
+<section class="py-16 lg:py-24 bg-slate-900 border-y border-slate-800">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <h2 class="text-2xl sm:text-3xl font-bold text-white">All plans at a glance</h2>
+      <p class="mt-4 text-slate-400">Compare durations, rates, and projected returns. All returns are calculated as simple interest over the plan duration.</p>
+    </div>
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+      <div class="grid grid-cols-5 bg-slate-700/50 border-b border-slate-700 text-[11px] font-semibold text-slate-400 tracking-wide uppercase px-6 py-3.5">
+        <span>Plan</span><span class="text-right">Duration</span><span class="text-right">Rate</span><span class="text-right">$10K becomes</span><span class="text-right">Profit</span>
+      </div>
+      <div class="grid grid-cols-5 items-center px-6 py-4 border-b border-slate-700"><span class="text-sm font-semibold text-white">108 Circle</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">200%</span><span class="text-sm font-semibold text-green-500 text-right">$610,000.00</span><span class="text-sm font-semibold text-green-500 text-right">+$600,000.00</span></div>
+      <div class="grid grid-cols-5 items-center px-6 py-4 border-b border-slate-700"><span class="text-sm font-semibold text-white">2222 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">200%</span><span class="text-sm font-semibold text-green-500 text-right">$610,000.00</span><span class="text-sm font-semibold text-green-500 text-right">+$600,000.00</span></div>
+      <div class="grid grid-cols-5 items-center px-6 py-4 border-b border-slate-700 bg-slate-700/20"><span class="text-sm font-semibold text-white">8888 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">300%</span><span class="text-sm font-semibold text-green-500 text-right">$910,000.00</span><span class="text-sm font-semibold text-green-500 text-right">+$900,000.00</span></div>
+      <div class="grid grid-cols-5 items-center px-6 py-4 border-b border-slate-700 bg-slate-700/20"><span class="text-sm font-semibold text-white">Tier 3 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">350%</span><span class="text-sm font-semibold text-green-500 text-right">$1,060,000.00</span><span class="text-sm font-semibold text-green-500 text-right">+$1,050,000.00</span></div>
+      <div class="grid grid-cols-5 items-center px-6 py-4 bg-slate-700/20"><span class="text-sm font-semibold text-white">Bitcoin Elite Group</span><span class="text-sm text-slate-400 text-right">2 weeks</span><span class="text-sm text-slate-400 text-right">750%</span><span class="text-sm font-semibold text-green-500 text-right">$1,060,000.00</span><span class="text-sm font-semibold text-green-500 text-right">+$1,050,000.00</span></div>
+    </div>
+    <div class="mt-8 text-center"><a href="/plans" class="inline-flex items-center text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">View detailed plan information <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></a></div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 lg:py-20 bg-white">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Ready to invest?</h2>
+    <p class="mt-4 text-slate-500 max-w-xl mx-auto">Create a free account, complete identity verification, and start with a plan that fits your timeline.</p>
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/register" class="inline-flex items-center bg-slate-900 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm">Create Your Account <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></a>
+      <a href="/plans" class="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">View All Plans →</a>
+    </div>
+    <p class="mt-6 text-xs text-slate-400">Free to join · No credit card required · Identity verification required before transacting</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-slate-950 border-t border-slate-800 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+      <div><a href="/" class="text-xl font-extrabold tracking-tight text-white">XSpace<span class="text-blue-500">Finance</span></a><p class="mt-4 text-sm text-slate-400 leading-relaxed">Fixed-duration investment plans with transparent returns. Serving individual investors in the United States, United Kingdom, and Canada.</p></div>
+      <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Platform</h4><ul class="space-y-3 text-sm text-slate-400"><li><a href="/plans" class="hover:text-white transition-colors">Investment Plans</a></li><li><a href="/calculator" class="hover:text-white transition-colors">ROI Calculator</a></li><li><a href="/about" class="hover:text-white transition-colors">About Us</a></li><li><a href="/register" class="hover:text-white transition-colors">Create Account</a></li></ul></div>
+      <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Legal</h4><ul class="space-y-3 text-sm text-slate-400"><li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li><li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li><li><a href="/risk" class="hover:text-white transition-colors">Risk Disclosure</a></li><li><a href="/cookies" class="hover:text-white transition-colors">Cookie Policy</a></li></ul></div>
+      <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Countries</h4><ul class="space-y-3 text-sm text-slate-400"><li class="flex items-center gap-2"><span class="w-5 h-auto">🇺🇸</span> United States</li><li class="flex items-center gap-2"><span class="w-5 h-auto">🇬🇧</span> United Kingdom</li><li class="flex items-center gap-2"><span class="w-5 h-auto">🇨🇦</span> Canada</li></ul></div>
+    </div>
+    <div class="border-t border-slate-800 mt-12 pt-8"><div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm"><p class="text-slate-500">© 2026 XSpaceFinance. All rights reserved.</p><p class="text-slate-500 text-xs text-center md:text-right max-w-lg">All investments carry risk. Projected returns are based on stated rates and are not guaranteed. Past performance does not guarantee future results.</p></div></div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const planSelect = document.getElementById('calc-plan');
+  const amountInput = document.getElementById('calc-amount');
+  const rangeText = document.getElementById('calc-range');
+  const submitBtn = document.getElementById('calc-submit');
+  const resultsDiv = document.getElementById('calc-results');
+  const placeholderDiv = document.getElementById('calc-placeholder');
+
+  function updateRange() {
+    const opt = planSelect.selectedOptions[0];
+    const min = parseFloat(opt.dataset.min);
+    const max = parseFloat(opt.dataset.max);
+    rangeText.textContent = 'Min: $' + min.toLocaleString() + ' — Max: $' + max.toLocaleString();
+    amountInput.min = min;
+    amountInput.max = max;
+  }
+
+  planSelect.addEventListener('change', updateRange);
+  updateRange();
+
+  submitBtn.addEventListener('click', function() {
+    const opt = planSelect.selectedOptions[0];
+    const amount = parseFloat(amountInput.value);
+
+    if (!amount || amount < parseFloat(opt.dataset.min) || amount > parseFloat(opt.dataset.max)) {
+      alert('Please enter a valid amount within the plan range.');
+      return;
+    }
+
+    const rate = parseFloat(opt.dataset.rate);
+    const days = parseInt(opt.dataset.days);
+    const durationLabel = opt.dataset.duration;
+    const planName = opt.dataset.name;
+
+    // Simple interest: A = P * (1 + rate/100)
+    const totalReturn = amount * (1 + rate / 100);
+    const profit = totalReturn - amount;
+    const effectiveRoi = rate;
+
+    const maturityDate = new Date();
+    maturityDate.setDate(maturityDate.getDate() + days);
+
+    document.getElementById('res-plan').textContent = planName;
+    document.getElementById('res-principal').textContent = '$' + amount.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('res-duration').textContent = durationLabel;
+    document.getElementById('res-rate').textContent = rate.toFixed(2) + '%';
+    document.getElementById('res-total').textContent = '$' + totalReturn.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('res-profit').textContent = '+$' + profit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('res-roi').textContent = effectiveRoi.toFixed(2) + '%';
+    document.getElementById('res-maturity').textContent = maturityDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+
+    placeholderDiv.classList.add('hidden');
+    resultsDiv.classList.remove('hidden');
+  });
+});
+</script>
+</body>
+</html>

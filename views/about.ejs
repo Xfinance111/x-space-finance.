@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; }
+    .font-display { font-family: 'Inter', sans-serif; }
+    
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+    .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+  </style>
+</head>
+<body class="bg-slate-950 text-white">
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center gap-8">
+        <a href="/" class="font-display text-xl font-extrabold tracking-tight uppercase text-white">XSpace<span class="text-blue-500">Finance</span></a>
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="/" class="text-sm font-medium text-slate-400 hover:text-white transition">Home</a>
+          <a href="/about" class="text-sm font-medium text-white transition active">About</a>
+          <a href="/plans" class="text-sm font-medium text-slate-400 hover:text-white transition">Plans</a>
+          <a href="/calculator" class="text-sm font-medium text-slate-400 hover:text-white transition">Calculator</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/signin" class="text-sm font-medium text-slate-400 hover:text-blue-500 transition hidden sm:inline">Sign In</a>
+        <a href="/register" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section - WHITE BACKGROUND -->
+  <section class="py-20 bg-white">
+    <div class="mx-auto max-w-7xl px-6 grid lg:grid-cols-2 gap-12">
+      <div>
+        <p class="text-xs font-mono font-semibold text-blue-600 uppercase tracking-widest mb-3">— Our Company</p>
+        <h1 class="font-display text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">Disciplined investing.<br/>Transparent operations.</h1>
+        <p class="text-slate-600 leading-relaxed">We build and operate a structured investment platform where every return rate is published, every deposit is manually reviewed, and every transaction is recorded with a full audit trail. Transparency is not a feature here — it is the operating model.</p>
+        <div class="mt-10 grid grid-cols-3 gap-6">
+          <div><p class="text-xs font-mono uppercase text-slate-500">Jurisdictions</p><p class="mt-1 font-semibold text-sm text-slate-900">USA · UK · Canada</p></div>
+          <div><p class="text-xs font-mono uppercase text-slate-500">Approach</p><p class="mt-1 font-semibold text-sm text-slate-900">Long-term, fixed-duration</p></div>
+          <div><p class="text-xs font-mono uppercase text-slate-500">Philosophy</p><p class="mt-1 font-semibold text-sm text-slate-900">Compliance-first growth</p></div>
+        </div>
+      </div>
+      <div class="grid place-items-center">
+        <div class="relative w-full max-w-md mx-auto aspect-square">
+          <div class="absolute inset-0 grid place-items-center">
+            <div class="relative size-72">
+              <div class="absolute inset-0 rounded-full border border-blue-300 animate-ping" style="animation-duration:2s;animation-delay:0s;opacity:0.4"></div>
+              <div class="absolute inset-0 rounded-full border border-blue-300 animate-ping" style="animation-duration:3s;animation-delay:0.4s;opacity:0.3"></div>
+              <div class="absolute inset-0 rounded-full border border-blue-300 animate-ping" style="animation-duration:4s;animation-delay:0.8s;opacity:0.2"></div>
+              <div class="absolute inset-6 rounded-full bg-gradient-to-br from-blue-100 to-green-50 grid place-items-center backdrop-blur-sm border border-blue-200">
+                <svg viewBox="0 0 24 24" class="size-24 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"></path>
+                  <path d="m8 12 3 3 5-6" stroke-width="2" class="text-green-600"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 p-4 rounded-xl bg-slate-100 border border-slate-200 shadow-lg">
+            <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-2">Live compliance feed</p>
+            <div class="flex items-center gap-2 animate-slide-in" id="complianceFeed">
+              <span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span class="text-sm font-medium text-slate-700" id="feedText">KYC verification approved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section - DARK BACKGROUND (slate-900) -->
+  <section class="py-20 bg-slate-900">
+    <div class="mx-auto max-w-5xl px-6 grid md:grid-cols-3 gap-12">
+      <h2 class="font-display text-2xl font-bold text-white">Our mission &amp; corporate overview</h2>
+      <div class="md:col-span-2 space-y-5 text-slate-400 leading-relaxed">
+        <p>XSpaceFinance was created to give individual investors in the <strong class="text-white">United States</strong>, <strong class="text-white">United Kingdom</strong>, and <strong class="text-white">Canada</strong> direct access to structured, fixed-duration investment plans. The platform publishes every return rate, fee schedule, and compounding method upfront — before any commitment is made.</p>
+        <p>We believe trust is earned through transparency rather than marketing. Every deposit is manually checked by our operations team. Every transaction is logged with a timestamped audit trail. Every plan has a clearly defined duration, return rate, and risk profile.</p>
+        <p>Our operating model is built around regulatory readiness and investor protection. While we continue to evaluate formal licensing pathways in each jurisdiction we serve, the platform already follows industry-standard practices for data security, anti-money laundering, and KYC verification.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jurisdictions Section - DARK -->
+  <section class="py-20 bg-slate-950 border-y border-slate-800">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="font-display text-3xl font-extrabold text-white mb-3">Jurisdictions we serve</h2>
+      <p class="text-slate-400 mb-10 max-w-2xl">XSpaceFinance is available to individual investors in three jurisdictions. Each market is supported with local currency, compliant deposit methods, and jurisdiction-appropriate disclosures.</p>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="text-4xl mb-3">🇺🇸</div>
+          <h3 class="font-display font-bold text-lg text-white">United States</h3>
+          <p class="text-xs font-mono text-blue-400 mt-1">USD · Bank Transfer &amp; Crypto</p>
+          <p class="text-sm text-slate-400 leading-relaxed mt-3">Operations are structured with reference to SEC guidelines for investment products and FinCEN requirements for money services businesses.</p>
+          <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mt-5 mb-2">Applicable frameworks</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">SEC</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">FinCEN</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">OFAC</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">CCPA</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">BSA</span>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="text-4xl mb-3">🇬🇧</div>
+          <h3 class="font-display font-bold text-lg text-white">United Kingdom</h3>
+          <p class="text-xs font-mono text-blue-400 mt-1">GBP · Bank Transfer &amp; Crypto</p>
+          <p class="text-sm text-slate-400 leading-relaxed mt-3">Our UK operations reference the Financial Conduct Authority (FCA) handbook and the Money Laundering Regulations 2017 for customer onboarding and transaction monitoring.</p>
+          <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mt-5 mb-2">Applicable frameworks</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">FCA</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">MLR 2017</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">HM Treasury</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">UK GDPR</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">ICO</span>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="text-4xl mb-3">🇨🇦</div>
+          <h3 class="font-display font-bold text-lg text-white">Canada</h3>
+          <p class="text-xs font-mono text-blue-400 mt-1">CAD · Bank Transfer &amp; Crypto</p>
+          <p class="text-sm text-slate-400 leading-relaxed mt-3">Canadian operations are structured with reference to FINTRAC reporting requirements and provincial securities commission guidelines for investment services.</p>
+          <p class="text-[10px] font-mono uppercase tracking-widest text-slate-500 mt-5 mb-2">Applicable frameworks</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">FINTRAC</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">OSFI</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">CSA</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">PIPEDA</span>
+            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-mono font-semibold">PCMLTFA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Regulatory & Compliance Framework - DARK -->
+  <section class="py-20 bg-slate-900">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="font-display text-3xl font-extrabold text-white mb-3">Regulatory &amp; compliance framework</h2>
+      <p class="text-slate-400 mb-10 max-w-2xl">A compliance-first approach. Our policies are modelled on the requirements of major financial regulators across the markets we operate in.</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"></path><path d="M14 13.12c0 2.38 0 6.38-1 8.88"></path><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"></path><path d="M2 12a10 10 0 0 1 18-6"></path><path d="M2 16h.01"></path><path d="M21.8 16c.2-2 .131-5.354 0-6"></path><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"></path><path d="M8.65 22c.21-.66.45-1.32.57-2"></path><path d="M9 6.8a6 6 0 0 1 9 5.2v2"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Know Your Customer (KYC)</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Every account requires identity verification before funds can be deposited or withdrawn. Accepted documents include a government-issued photo ID, proof of address, and, where applicable, source-of-funds documentation. KYC reviews are processed by our compliance team within 24–48 hours.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Anti-Money Laundering (AML)</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">We implement transaction monitoring and suspicious-activity flagging aligned with AML best practice. Every deposit is reviewed before being credited. Unusual or large transactions trigger enhanced due diligence.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Data Protection &amp; Privacy</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Personal data is processed in line with UK GDPR, EU GDPR, the California Consumer Privacy Act (CCPA), and Canada's PIPEDA. All data is encrypted at rest and in transit using AES-256 and TLS 1.3.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Full Audit Trail</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Every financial transaction — deposits, withdrawals, ROI distributions, and balance adjustments — is recorded with immutable timestamps, user IDs, and action metadata. Logs are retained for a minimum of seven years.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><circle cx="12" cy="12" r="3"></circle><path d="m16 16-1.9-1.9"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Sanctions &amp; PEP Screening</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Account registration includes screening against OFAC (USA), HM Treasury (UK), and OSFI (Canada) sanctions lists. Politically exposed persons are subject to enhanced review.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-800 border border-slate-700 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path><path d="M12 15h.01"></path><path d="M12 7v4"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Complaints &amp; Dispute Resolution</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">We maintain a formal complaint-handling procedure. All complaints are acknowledged within two business days and investigated within 30 days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How We Operate - DARK -->
+  <section class="py-20 bg-slate-950 border-y border-slate-800">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="font-display text-3xl font-extrabold text-white mb-3">How we operate</h2>
+      <p class="text-slate-400 mb-10 max-w-2xl">Our operational model is built on four principles. Each one is enforced through platform controls, not just policy.</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Transparent Returns</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">All ROI rates are calculated using clearly defined compound interest formulas and published before investment. There are no hidden fees, no performance-based markups, and no undisclosed charges. What you see on the plan page is what governs your returns.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Manual Deposit Verification</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">No deposit is automatically credited. Every incoming transfer — whether bank or cryptocurrency — is reviewed by an operations team member. This manual gate prevents unauthorized crediting and ensures alignment between submitted proof and actual receipt.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"></path><path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17"></path><path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"></path><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Country-Aware Configuration</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">When you register and select your country, your dashboard is automatically configured with the correct local currency (USD, GBP, or CAD), jurisdiction-appropriate deposit methods, and compliant formatting. This reduces friction and prevents cross-border errors.</p>
+          </div>
+        </div>
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 flex gap-4">
+          <div class="size-10 shrink-0 grid place-items-center rounded-md bg-blue-500/10 text-blue-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.852 14.772-.383.923"></path><path d="M13.148 14.772a3 3 0 1 0-2.296-5.544l-.383-.923"></path><path d="m13.148 9.228.383-.923"></path><path d="m13.53 15.696-.382-.924a3 3 0 1 1-2.296-5.544"></path><path d="m14.772 10.852.923-.383"></path><path d="m14.772 13.148.923.383"></path><path d="M4.5 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-.5"></path><path d="M4.5 14H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-.5"></path><path d="M6 18h.01"></path><path d="M6 6h.01"></path><path d="m9.228 10.852-.923-.383"></path><path d="m9.228 13.148-.923.383"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-display font-bold mb-2 text-white">Secure Infrastructure</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">The platform enforces CSRF token validation, rate limiting on authentication endpoints, bcrypt password hashing with per-user salts, HTTPS-only sessions, and HTTP-only cookies. All API endpoints are authenticated and scope-limited. Infrastructure access is restricted to authorized personnel only.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Technical Controls - DARK -->
+  <section class="py-20 bg-slate-900">
+    <div class="mx-auto max-w-7xl px-6">
+      <h2 class="font-display text-3xl font-extrabold text-white mb-3">Security &amp; technical controls</h2>
+      <p class="text-slate-400 mb-10 max-w-2xl">Security is enforced at every layer — from application code to infrastructure. These controls are active by default, not optional configurations.</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Encryption at rest</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">AES-256 encryption for all stored personal and financial data.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Encryption in transit</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">TLS 1.3 enforced on all connections. No plaintext fallback.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Password hashing</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">bcrypt with per-user salts. No reversible password storage.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">CSRF protection</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">Token validation on every state-changing request.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Rate limiting</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">Throttled login, registration, and API endpoints to prevent brute-force.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path><path d="M8.5 8.5v.01"></path><path d="M16 15.5v.01"></path><path d="M12 12v.01"></path><path d="M11 17v.01"></path><path d="M7 14v.01"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Session security</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">HTTP-only, secure-flag cookies with server-side session storage.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Input validation</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">All user inputs are validated and sanitized before processing.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-800 border border-slate-700">
+          <div class="size-9 grid place-items-center rounded-md bg-blue-500/10 text-blue-400 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          </div>
+          <h3 class="font-display font-bold text-sm mb-1.5 text-white">Access control</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">Role-based access with middleware enforcement on every route.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section - DARK -->
+  <section class="py-24 border-t border-slate-800 bg-slate-950">
+    <div class="mx-auto max-w-3xl px-6 text-center">
+      <h2 class="font-display text-4xl font-extrabold text-white mb-4">Ready to get started?</h2>
+      <p class="text-slate-400 mb-8">Create a free account, complete identity verification, and explore our investment plans — at your own pace.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="/register" class="px-7 py-3.5 bg-blue-600 text-white font-semibold rounded-lg shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition">Create Your Account</a>
+        <a href="/plans" class="px-7 py-3.5 border border-slate-700 text-white font-semibold rounded-lg hover:bg-slate-800 transition">View Plans →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer - ORIGINAL DARK BACKGROUND -->
+  <footer class="py-20 bg-slate-900 border-t border-slate-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div class="grid md:grid-cols-4 gap-12 mb-16">
+        <div class="md:col-span-2">
+          <div class="font-display text-2xl font-extrabold tracking-tight uppercase mb-4 text-white">XSpace<span class="text-blue-500">Finance</span></div>
+          <p class="text-slate-400 max-w-sm mb-6 text-sm leading-relaxed">Fixed-duration investment plans with transparent returns. Built for individual investors across the United States, United Kingdom, and Canada.</p>
+          <div class="flex gap-2">
+            <span class="px-2 py-1 border border-slate-700 rounded text-[10px] font-bold tracking-wider text-slate-400">USA</span>
+            <span class="px-2 py-1 border border-slate-700 rounded text-[10px] font-bold tracking-wider text-slate-400">UK</span>
+            <span class="px-2 py-1 border border-slate-700 rounded text-[10px] font-bold tracking-wider text-slate-400">CAN</span>
+          </div>
+        </div>
+        <div>
+          <p class="font-display font-bold mb-5 text-white">Platform</p>
+          <ul class="space-y-3 text-sm text-slate-400">
+            <li><a href="/plans" class="hover:text-blue-500 transition">Investment Plans</a></li>
+            <li><a href="/calculator" class="hover:text-blue-500 transition">ROI Calculator</a></li>
+            <li><a href="/about" class="hover:text-blue-500 transition">Our Company</a></li>
+            <li><a href="/register" class="hover:text-blue-500 transition">Create Account</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-display font-bold mb-5 text-white">Legal</p>
+          <ul class="space-y-3 text-sm text-slate-400">
+            <li><a href="/privacy" class="hover:text-blue-500 transition">Privacy Policy</a></li>
+            <li><a href="/terms" class="hover:text-blue-500 transition">Terms of Service</a></li>
+            <li><a href="/risk" class="hover:text-blue-500 transition">Risk Disclosure</a></li>
+            <li><a href="/cookies" class="hover:text-blue-500 transition">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between gap-4">
+        <p class="text-xs text-slate-500 font-mono">© 2026 XSpaceFinance. All rights reserved.</p>
+        <p class="text-[11px] leading-relaxed text-slate-500 max-w-2xl">All investments carry risk. Projected returns are based on stated rates and compounding schedules and are not guaranteed. Past performance does not guarantee future results.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Support Chat Button -->
+  <button onclick="alert('Support: support@xspacefinance.com')" class="fixed bottom-6 right-6 z-50 size-14 rounded-full bg-blue-600 text-white grid place-items-center shadow-xl shadow-blue-600/30 hover:scale-105 transition">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path></svg>
+  </button>
+
+  <script>
+    // Live compliance feed rotating messages
+    const complianceMessages = [
+      "Data encryption verified",
+      "Quarterly audit completed",
+      "KYC sanctions list screened",
+      "AML transaction monitoring",
+      "Compliance audit passed",
+      "GDPR compliance verified",
+      "Security protocols active"
+    ];
+    
+    let messageIndex = 0;
+    const feedText = document.getElementById('feedText');
+    const feedContainer = document.getElementById('complianceFeed');
+    
+    setInterval(() => {
+      messageIndex = (messageIndex + 1) % complianceMessages.length;
+      if (feedContainer) {
+        feedContainer.classList.remove('animate-slide-in');
+        void feedContainer.offsetWidth; // Force reflow
+        feedContainer.classList.add('animate-slide-in');
+      }
+      if (feedText) {
+        feedText.textContent = complianceMessages[messageIndex];
+      }
+    }, 4000);
+  </script>
+</body>
+</html>

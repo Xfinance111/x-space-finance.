@@ -1,0 +1,28 @@
+<header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-6 py-3">
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-slate-800"><%= title || 'Admin' %></h1>
+    <div class="flex items-center gap-3">
+      <div class="relative" id="adminProfileDropdownWrapper">
+        <button id="adminProfileDropdownBtn" class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100">
+          <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          </div>
+          <span class="hidden sm:inline text-sm font-medium text-slate-700"><%= user.first_name %> <%= user.last_name %></span>
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+        </button>
+        <div id="adminProfileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-50">
+          <div class="px-4 py-3 border-b border-slate-100">
+            <p class="text-sm font-medium text-slate-800"><%= user.first_name %> <%= user.last_name %></p>
+            <p class="text-xs text-slate-500 truncate"><%= user.email %></p>
+          </div>
+          <div class="py-1">
+            <a href="/admin" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Admin Dashboard</a>
+            <a href="/dashboard" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Back to Site</a>
+            <div class="border-t border-slate-100 my-1"></div>
+            <a href="/auth/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

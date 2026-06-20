@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100">
+  <div class="flex min-h-screen">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="flex-1 p-8">
+      <h1 class="text-2xl font-bold mb-6">KYC Verification</h1>
+
+      <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b">
+            <tr>
+              <th class="px-4 py-3 text-left">Name</th>
+              <th class="px-4 py-3 text-left">Email</th>
+              <th class="px-4 py-3 text-left">Status</th>
+              <th class="px-4 py-3 text-left">Submitted</th>
+              <th class="px-4 py-3 text-left">Document</th>
+              <th class="px-4 py-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (submissions && submissions.length > 0) { %>
+              <% submissions.forEach(u => { %>
+              <tr class="border-b hover:bg-slate-50">
+                <td class="px-4 py-3"><%= u.first_name %> <%= u.last_name %></td>
+                <td class="px-4 py-3"><%= u.email %></td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 rounded text-xs
+                    <%= u.kyc_status === 'approved' ? 'bg-green-100 text-green-700' :
+                       u.kyc_status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                       'bg-slate-100 text-slate-600' %>
+                  ">
+                    <%= u.kyc_status || 'not submitted' %>
+                  </span>
+                </td>
+                <td class="px-4 py-3"><%= u.created_at ? new Date(u.created_at).toLocaleDateString() : '-' %></td>
+                <td class="px-4 py-3">
+                  <% if (u.kyc_doc) { %>
+                    <a href="/uploads/kyc/<%= u.kyc_doc %>" target="_blank" class="text-blue-600 hover:underline">View</a>
+                  <% } else { %>
+                    <span class="text-slate-400">No file</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-3 flex gap-2">
+                  <% if (u.kyc_status !== 'approved') { %>
+                    <form action="/admin/user/<%= u.id %>/kyc-approve" method="POST" class="inline">
+                      <button type="submit" class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">Approve</button>
+                    </form>
+                  <% } %>
+                  <% if (u.kyc_status !== 'rejected' && u.kyc_status !== 'approved') { %>
+                    <form action="/admin/user/<%= u.id %>/kyc-reject" method="POST" class="inline">
+                      <button type="submit" class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">Reject</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No KYC submissions yet.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Plans - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+  <%- include('../partials/admin-sidebar') %>
+
+  <div class="lg:ml-72 min-h-screen">
+    <!-- Header -->
+    <div class="bg-slate-800/50 border-b border-slate-700 px-6 py-4">
+      <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">Investment Plans</h1>
+      <p class="text-slate-400 text-sm">Create, edit, or toggle plans (inactive plans are hidden from users)</p>
+    </div>
+
+    <div class="p-6">
+      <!-- Create Button -->
+      <button onclick="document.getElementById('createModal').classList.remove('hidden')" class="mb-4 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition">
+        + Create New Plan
+      </button>
+
+      <!-- Plan Cards -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% plans.forEach(function(p) { %>
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="font-bold text-lg"><%= p.name %></h3>
+                <p class="text-xs text-slate-400">ID: <%= p.id %></p>
+              </div>
+              <span class="px-2 py-1 rounded text-xs <%= p.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' %>">
+                <%= p.is_active ? 'Active' : 'Inactive' %>
+              </span>
+            </div>
+
+            <div class="space-y-2 mb-4">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Duration</span>
+                <span class="font-semibold"><%= p.duration_days || p.duration_months * 30 %> days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">ROI</span>
+                <span class="font-semibold text-green-400"><%= p.roi_percent %>%/month</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Range</span>
+                <span class="font-semibold">$<%= p.min_amount.toLocaleString() %> - $<%= p.max_amount.toLocaleString() %></span>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick='editPlan(<%= JSON.stringify(p) %>)' class="flex-1 px-3 py-2 bg-blue-600 rounded-lg text-sm hover:bg-blue-700 transition">Edit</button>
+              <button onclick='togglePlan(<%= p.id %>, <%= p.is_active %>)' class="flex-1 px-3 py-2 rounded-lg text-sm <%= p.is_active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %> transition">
+                <%= p.is_active ? 'Deactivate' : 'Reactivate' %>
+              </button>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div id="createModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+    <div class="bg-slate-800 rounded-xl max-w-md w-full p-6">
+      <h2 class="text-xl font-bold mb-4">Create New Plan</h2>
+      <form method="POST" action="/admin/plans/create">
+        <div class="space-y-3">
+          <input type="text" name="name" placeholder="Plan Name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" required>
+          <input type="number" name="duration_months" id="createMonths" placeholder="Duration (months)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateCreate()" required>
+          <input type="number" step="0.01" name="roi_percent" id="createRoi" placeholder="Monthly ROI %" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateCreate()" required>
+          <input type="number" name="min_amount" id="createMin" placeholder="Min Amount" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateCreate()" required>
+          <input type="number" name="max_amount" placeholder="Max Amount" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" required>
+
+          <!-- Projection display -->
+          <div class="bg-slate-700/50 rounded-lg p-3 text-center">
+            <p class="text-sm text-slate-400">Example projection for $10,000</p>
+            <p class="text-lg font-bold text-blue-400" id="createMaturity">$0.00</p>
+            <p class="text-sm text-green-400" id="createProfit">+$0.00</p>
+          </div>
+
+          <label class="flex items-center gap-2">
+            <input type="checkbox" name="is_active" checked class="w-4 h-4"> Active
+          </label>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition">Create</button>
+            <button type="button" onclick="document.getElementById('createModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-slate-600 rounded-lg hover:bg-slate-500 transition">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+    <div class="bg-slate-800 rounded-xl max-w-md w-full p-6">
+      <h2 class="text-xl font-bold mb-4">Edit Plan</h2>
+      <form id="editForm" method="POST" action="/admin/plans/update">
+        <input type="hidden" name="id" id="editId">
+        <div class="space-y-3">
+          <input type="text" name="name" id="editName" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" required>
+          <input type="number" name="duration_months" id="editMonths" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateEdit()" required>
+          <input type="number" step="0.01" name="roi_percent" id="editRoi" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateEdit()" required>
+          <input type="number" name="min_amount" id="editMin" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" oninput="calculateEdit()" required>
+          <input type="number" name="max_amount" id="editMax" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2" required>
+
+          <!-- Projection display -->
+          <div class="bg-slate-700/50 rounded-lg p-3 text-center">
+            <p class="text-sm text-slate-400">Example projection for $10,000</p>
+            <p class="text-lg font-bold text-blue-400" id="editMaturity">$0.00</p>
+            <p class="text-sm text-green-400" id="editProfit">+$0.00</p>
+          </div>
+
+          <label class="flex items-center gap-2">
+            <input type="checkbox" name="is_active" id="editActive" class="w-4 h-4"> Active
+          </label>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Update</button>
+            <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-slate-600 rounded-lg hover:bg-slate-500 transition">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ===== Toggle active status =====
+    async function togglePlan(id, currentStatus) {
+      const action = currentStatus ? 'deactivate' : 'reactivate';
+      if (!confirm(`Are you sure you want to ${action} this plan?`)) return;
+      const res = await fetch(`/admin/plans/${id}/toggle`, { method: 'POST' });
+      if (res.ok) location.reload();
+      else alert('Failed to toggle plan');
+    }
+
+    // ===== Edit plan – populate modal =====
+    function editPlan(p) {
+      document.getElementById('editId').value = p.id;
+      document.getElementById('editName').value = p.name;
+      document.getElementById('editMonths').value = p.duration_months || 1;
+      document.getElementById('editRoi').value = p.roi_percent;
+      document.getElementById('editMin').value = p.min_amount;
+      document.getElementById('editMax').value = p.max_amount;
+      document.getElementById('editActive').checked = p.is_active === 1;
+      document.getElementById('editModal').classList.remove('hidden');
+      calculateEdit();
+    }
+
+    // ===== Calculator for Create =====
+    function calculateCreate() {
+      const amount = 10000;
+      const roi = parseFloat(document.getElementById('createRoi').value) || 0;
+      const months = parseFloat(document.getElementById('createMonths').value) || 1;
+      const total = amount * Math.pow(1 + roi / 100, months);
+      document.getElementById('createMaturity').textContent = '$' + total.toFixed(2);
+      document.getElementById('createProfit').textContent = '+$' + (total - amount).toFixed(2);
+    }
+
+    // ===== Calculator for Edit =====
+    function calculateEdit() {
+      const amount = 10000;
+      const roi = parseFloat(document.getElementById('editRoi').value) || 0;
+      const months = parseFloat(document.getElementById('editMonths').value) || 1;
+      const total = amount * Math.pow(1 + roi / 100, months);
+      document.getElementById('editMaturity').textContent = '$' + total.toFixed(2);
+      document.getElementById('editProfit').textContent = '+$' + (total - amount).toFixed(2);
+    }
+
+    // Initial calculation on load
+    document.addEventListener('DOMContentLoaded', function() {
+      calculateCreate();
+      calculateEdit();
+    });
+  </script>
+
+</body>
+</html>

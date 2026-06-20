@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #64748b; }
+    .sidebar-link:hover { background: #f1f5f9; color: #1e293b; }
+    .sidebar-link.active { background: #e0f2fe; color: #0284c7; }
+    .sidebar-icon { width: 20px; height: 20px; }
+    .sidebar-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; padding-left: 12px; }
+    .topbar { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 40; }
+    .profile-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; }
+    .form-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; font-size: 14px; transition: all 0.2s; }
+    .form-input:focus { outline: none; border-color: #3b82f6; ring: 2px solid #3b82f6; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: #1e293b; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="flex">
+  <%- include('../partials/complete-sidebar') %>
+
+  <div class="flex-1 lg:ml-64">
+    <!-- TOPBAR (partial) -->
+    <%- include('../partials/topbar') %>
+
+    <div class="p-6">
+      <!-- Flash messages -->
+      <% if (messages && messages.success) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><%= messages.success %></div>
+      <% } %>
+      <% if (messages && messages.error) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><%= messages.error %></div>
+      <% } %>
+
+      <!-- User Info Header -->
+      <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-600 font-bold text-2xl"><%= user?.first_name?.charAt(0) || 'U' %></span>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-800"><%= user?.first_name %> <%= user?.last_name %></h2>
+            <p class="text-slate-500 text-sm"><%= user?.email %></p>
+            <div class="flex items-center gap-3 mt-2 text-xs text-slate-400">
+              <span>Member since <%= new Date(user?.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) %></span>
+              <span>|</span>
+              <span><%= user?.country || 'United Kingdom' %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Personal Information -->
+        <div class="profile-card">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="font-semibold text-slate-800">Personal Information</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Update your name and contact details</p>
+          </div>
+          <form action="/dashboard/profile/update" method="POST" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" value="<%= user?.first_name %>" class="form-input">
+              </div>
+              <div>
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" value="<%= user?.last_name %>" class="form-input">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Email Address</label>
+              <input type="email" value="<%= user?.email %>" class="form-input bg-slate-50" readonly disabled>
+              <p class="text-xs text-slate-400 mt-1">Email address cannot be changed for security purposes</p>
+            </div>
+            <div>
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phone" value="<%= user?.phone || '' %>" class="form-input" placeholder="Enter your phone number">
+            </div>
+            <div>
+              <label class="form-label">Country</label>
+              <select name="country" class="form-input">
+                <option value="UK" <%= user?.country === 'UK' ? 'selected' : '' %>>United Kingdom (£ GBP)</option>
+                <option value="US" <%= user?.country === 'US' ? 'selected' : '' %>>United States ($ USD)</option>
+                <option value="CA" <%= user?.country === 'CA' ? 'selected' : '' %>>Canada ($ CAD)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Date of Birth</label>
+              <input type="date" name="dob" value="<%= user?.dob || '' %>" class="form-input">
+            </div>
+            <div>
+              <label class="form-label">Address line 1</label>
+              <input type="text" name="address" value="<%= user?.address || '' %>" class="form-input" placeholder="Address line 1">
+            </div>
+            <div>
+              <label class="form-label">Address line 2 (optional)</label>
+              <input type="text" name="address2" value="<%= user?.address2 || '' %>" class="form-input" placeholder="Address line 2">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="form-label">City</label>
+                <input type="text" name="city" value="<%= user?.city || '' %>" class="form-input" placeholder="City">
+              </div>
+              <div>
+                <label class="form-label">State / Province</label>
+                <input type="text" name="state" value="<%= user?.state || '' %>" class="form-input" placeholder="State">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Postal Code</label>
+              <input type="text" name="postal_code" value="<%= user?.postal_code || '' %>" class="form-input" placeholder="Postal code">
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition">Update Profile</button>
+          </form>
+        </div>
+
+        <!-- Security -->
+        <div class="profile-card">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="font-semibold text-slate-800">Security</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Update your password to keep your account secure</p>
+          </div>
+          <form action="/dashboard/change-password" method="POST" class="p-6 space-y-4">
+            <div>
+              <label class="form-label">Current Password</label>
+              <input type="password" name="current_password" class="form-input" placeholder="Enter current password">
+            </div>
+            <div>
+              <label class="form-label">New Password</label>
+              <input type="password" name="new_password" class="form-input" placeholder="Enter new password">
+            </div>
+            <div>
+              <label class="form-label">Confirm Password</label>
+              <input type="password" name="confirm_password" class="form-input" placeholder="Confirm new password">
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs font-medium text-slate-700 mb-2">Password Requirements:</p>
+              <ul class="text-xs text-slate-500 space-y-1">
+                <li>✓ Minimum 8 characters</li>
+                <li>✓ At least one uppercase and one lowercase letter</li>
+                <li>✓ At least one number</li>
+              </ul>
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition">Change Password</button>
+          </form>
+        </div>
+
+        <!-- KYC -->
+        <div class="profile-card">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="font-semibold text-slate-800">Identity Verification (KYC)</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Required to process withdrawals</p>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm text-slate-600">Verification Status</span>
+              <span class="px-2 py-1 rounded-full text-xs 
+                <%= user?.kyc_status === 'approved' ? 'bg-green-100 text-green-700' : 
+                   user?.kyc_status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                   'bg-slate-100 text-slate-600' %>">
+                <%= user?.kyc_status === 'approved' ? 'Verified ✓' : 
+                   user?.kyc_status === 'pending' ? 'Pending Review' : 
+                   'Not Submitted' %>
+              </span>
+            </div>
+
+            <% if (user?.kyc_status !== 'approved') { %>
+              <form action="/dashboard/kyc/submit" method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                  <label class="form-label">Document Type</label>
+                  <select name="document_type" class="form-input">
+                    <option value="passport">Passport</option>
+                    <option value="drivers_license">Driver's License</option>
+                    <option value="national_id">National ID Card</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Upload Document</label>
+                  <input type="file" name="front_document" class="form-input pt-2" accept="image/*,.pdf" required>
+                  <p class="text-xs text-slate-400 mt-1">JPG, PNG, or PDF. Maximum file size 5MB.</p>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+                  Submit for Verification
+                </button>
+              </form>
+            <% } else { %>
+              <div class="text-center py-4 text-green-600">
+                <svg class="w-8 h-8 mx-auto mb-2 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <p>Your identity is verified.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Referral -->
+        <div class="profile-card">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="font-semibold text-slate-800">Referral Program</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Invite others and earn bonuses</p>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label class="form-label">Your Referral Code</label>
+              <div class="flex gap-2">
+                <input type="text" value="<%= user?.referral_code || '81447C76' %>" class="form-input bg-slate-50 font-mono" readonly>
+                <button class="px-4 py-2 bg-slate-100 rounded-lg text-sm hover:bg-slate-200 transition">Copy</button>
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Referral Link</label>
+              <div class="flex gap-2">
+                <input type="text" value="https://xspacefinance.com/register?ref=<%= user?.referral_code || '81447C76' %>" class="form-input bg-slate-50 text-xs" readonly>
+                <button class="px-4 py-2 bg-slate-100 rounded-lg text-sm hover:bg-slate-200 transition">Copy Link</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-center pt-2">
+              <div><p class="text-2xl font-bold text-slate-800">0</p><p class="text-xs text-slate-500">Referrals</p></div>
+              <div><p class="text-2xl font-bold text-slate-800">0</p><p class="text-xs text-slate-500">Active</p></div>
+              <div><p class="text-2xl font-bold text-emerald-600">£0.00</p><p class="text-xs text-slate-500">Earned</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Details -->
+      <div class="profile-card mt-6">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="font-semibold text-slate-800">Account Details</h3>
+        </div>
+        <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p class="text-xs text-slate-500">Member Since</p>
+            <p class="font-medium text-slate-800"><%= new Date(user?.created_at).toLocaleDateString() %></p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Last Login</p>
+            <p class="font-medium text-slate-800"><%= user?.last_login ? new Date(user.last_login).toLocaleString() : 'Never' %></p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Account Status</p>
+            <p class="font-medium text-emerald-600">Active</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Currency</p>
+            <p class="font-medium text-slate-800"><%= user?.currency || 'GBP' %> (£)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User dropdown script is already inside topbar partial, no need to duplicate -->
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Investments - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #64748b; }
+    .sidebar-link:hover { background: #f1f5f9; color: #1e293b; }
+    .sidebar-link.active { background: #e0f2fe; color: #0284c7; }
+    .sidebar-icon { width: 20px; height: 20px; }
+    .sidebar-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; padding-left: 12px; }
+    .topbar { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 40; }
+    .investment-card { transition: all 0.2s; }
+    .investment-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -6px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+
+<div class="flex">
+  <%- include('../partials/complete-sidebar') %>
+
+  <div class="flex-1 lg:ml-64">
+    <!-- TOPBAR (partial) -->
+    <%- include('../partials/topbar') %>
+
+    <div class="p-6">
+      <!-- Stats Summary -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <p class="text-xs text-slate-500">Total Invested</p>
+          <p class="text-xl font-bold text-slate-800">$<%= totalInvested ? totalInvested.toLocaleString() : '0.00' %></p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <p class="text-xs text-slate-500">Active Plans</p>
+          <p class="text-xl font-bold text-slate-800"><%= activeCount || 0 %></p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <p class="text-xs text-slate-500">Expected Returns</p>
+          <p class="text-xl font-bold text-emerald-600">$<%= totalExpectedReturn ? totalExpectedReturn.toLocaleString() : '0.00' %></p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <p class="text-xs text-slate-500">Total Profit</p>
+          <p class="text-xl font-bold text-emerald-600">$<%= totalProfit ? totalProfit.toLocaleString() : '0.00' %></p>
+        </div>
+      </div>
+
+      <!-- Active Investments -->
+      <h2 class="font-semibold text-slate-800 mb-4">Active Investments</h2>
+      
+      <% const activeInvestments = investments ? investments.filter(i => i.status === 'active') : []; %>
+      <% if (activeInvestments.length > 0) { %>
+        <div class="grid grid-cols-1 gap-4 mb-8">
+          <% activeInvestments.forEach(function(inv) { 
+            const expectedReturn = parseFloat(inv.amount) * (1 + parseFloat(inv.roi_percent) / 100);
+            const profit = expectedReturn - parseFloat(inv.amount);
+            const startDate = new Date(inv.created_at);
+            const endDate = inv.end_date ? new Date(inv.end_date) : new Date(startDate.getTime() + (inv.duration_days || 30) * 24 * 60 * 60 * 1000);
+            const today = new Date();
+            const totalDays = inv.duration_days || 30;
+            const elapsedDays = Math.max(0, Math.min(totalDays, Math.floor((today - startDate) / (1000 * 60 * 60 * 24))));
+            const progress = Math.round((elapsedDays / totalDays) * 100);
+          %>
+            <div class="bg-white rounded-xl border border-slate-200 p-5 investment-card">
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <h3 class="font-bold text-slate-800"><%= inv.plan_name %></h3>
+                  <p class="text-xs text-slate-500">Invested on <%= startDate.toLocaleDateString() %></p>
+                </div>
+                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full">Active</span>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p class="text-xs text-slate-400">Amount</p>
+                  <p class="font-semibold text-slate-800">$<%= parseFloat(inv.amount).toLocaleString() %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">ROI</p>
+                  <p class="font-semibold text-emerald-600"><%= inv.roi_percent %>%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Expected Return</p>
+                  <p class="font-semibold text-slate-800">$<%= expectedReturn.toLocaleString() %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Maturity</p>
+                  <p class="font-medium text-slate-700"><%= endDate.toLocaleDateString() %></p>
+                </div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-slate-100">
+                <div class="w-full bg-slate-200 rounded-full h-1.5">
+                  <div class="bg-blue-600 h-1.5 rounded-full" style="width: <%= Math.min(100, progress) %>%"></div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2"><%= Math.min(100, progress) %>% Complete</p>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="bg-white rounded-xl border border-slate-200 p-8 text-center mb-8">
+          <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+          </svg>
+          <p class="text-slate-500">No active investments yet</p>
+          <a href="/dashboard/new-investment" class="inline-block mt-3 text-sm text-blue-600 hover:underline">Start investing →</a>
+        </div>
+      <% } %>
+
+      <!-- Past Investments -->
+      <h2 class="font-semibold text-slate-800 mb-4 mt-6">Past Investments</h2>
+      <% const pastInvestments = investments ? investments.filter(i => i.status !== 'active') : []; %>
+      <% if (pastInvestments.length > 0) { %>
+        <div class="grid grid-cols-1 gap-3">
+          <% pastInvestments.forEach(function(inv) { %>
+            <div class="bg-white rounded-xl border border-slate-200 p-4 opacity-75">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="font-semibold text-slate-800"><%= inv.plan_name %></h3>
+                  <p class="text-xs text-slate-500">Invested $<%= parseFloat(inv.amount).toLocaleString() %> • <%= new Date(inv.created_at).toLocaleDateString() %></p>
+                </div>
+                <span class="px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">Completed</span>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+          <p class="text-slate-400 text-sm">No past investments</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- User dropdown script is already in topbar partial, no need to duplicate -->
+</body>
+</html>

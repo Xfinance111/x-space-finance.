@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Plans — Fixed-Duration Compound Interest Plans | XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; }
+    .font-display { font-family: 'Inter', sans-serif; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(20px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    .animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+    
+    .plans-bar {
+      transition: all 0.5s ease-out;
+      animation: fadeIn 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    .plans-node {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .plans-trajectory {
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: drawLine 1.5s ease-out forwards;
+    }
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center gap-8">
+        <a href="/" class="font-display text-xl font-extrabold tracking-tight uppercase text-white">XSpace<span class="text-blue-500">Finance</span></a>
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="/" class="text-sm font-medium text-white transition active">Home</a>
+          <a href="/about" class="text-sm font-medium text-slate-400 hover:text-white transition">About</a>
+          <a href="/plans" class="text-sm font-medium text-slate-400 hover:text-white transition">Plans</a>
+          <a href="/calculator" class="text-sm font-medium text-slate-400 hover:text-white transition">Calculator</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/signin" class="text-sm font-medium text-slate-400 hover:text-blue-500 transition hidden sm:inline">Sign In</a>
+        <a href="/register" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section - WHITE BACKGROUND with Animated Chart -->
+  <section class="bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        
+        <!-- Left Content -->
+        <div class="lg:col-span-5 xl:col-span-5">
+          <div class="flex items-center gap-2.5">
+            <div class="h-px w-8 bg-blue-400"></div>
+            <p class="text-[11px] font-medium text-blue-600 tracking-[0.2em] uppercase">Investment Plans</p>
+          </div>
+          
+          <h1 class="mt-7 text-[1.625rem] sm:text-[2rem] lg:text-[2.25rem] font-bold text-slate-900 leading-[1.2] tracking-tight">
+            Duration-based structure.<br class="hidden sm:block">
+            Scalable compound returns.
+          </h1>
+          
+          <p class="mt-5 text-[0.9375rem] text-slate-600 leading-[1.75] max-w-md">
+            Each plan locks in a fixed daily rate applied over a defined duration. Longer commitments earn higher rates — a deliberate structure designed around compound interest mechanics.
+          </p>
+          
+          <div class="mt-9 flex flex-col sm:flex-row gap-3.5">
+            <a href="#plans-section" class="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm">
+              <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg>
+              Choose a Plan
+            </a>
+            <a href="/calculator" class="inline-flex items-center justify-center border border-slate-300 text-slate-700 px-6 py-3 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
+              Try Calculator
+            </a>
+          </div>
+          
+          <div class="mt-10 pt-6 border-t border-slate-200">
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5">
+              <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> Published rates</span>
+              <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> Fixed durations</span>
+              <span class="flex items-center gap-2 text-xs text-slate-600"><svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg> No hidden terms</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Animated Chart -->
+        <div class="hidden lg:block lg:col-span-7 xl:col-span-7">
+          <div class="relative">
+            <svg class="w-full h-auto" viewBox="0 0 560 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="planBar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#475569" stop-opacity="0.45"/><stop offset="100%" stop-color="#334155" stop-opacity="0.30"/></linearGradient>
+                <linearGradient id="planBar2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#475569" stop-opacity="0.50"/><stop offset="100%" stop-color="#334155" stop-opacity="0.35"/></linearGradient>
+                <linearGradient id="planBar3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#64748b" stop-opacity="0.45"/><stop offset="100%" stop-color="#475569" stop-opacity="0.35"/></linearGradient>
+                <linearGradient id="planBar4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#64748b" stop-opacity="0.55"/><stop offset="100%" stop-color="#475569" stop-opacity="0.40"/></linearGradient>
+                <linearGradient id="planBar5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.40"/><stop offset="100%" stop-color="#64748b" stop-opacity="0.30"/></linearGradient>
+                <linearGradient id="planTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.12"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.04"/></linearGradient>
+                <linearGradient id="planSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#334155" stop-opacity="0.30"/><stop offset="100%" stop-color="#1e293b" stop-opacity="0.50"/></linearGradient>
+              </defs>
+              
+              <!-- Grid lines -->
+              <g stroke="#475569" stroke-width="0.3" opacity="0.06">
+                <line x1="40" y1="30" x2="530" y2="30"/><line x1="40" y1="57" x2="530" y2="57"/>
+                <line x1="40" y1="84" x2="530" y2="84"/><line x1="40" y1="111" x2="530" y2="111"/>
+                <line x1="40" y1="138" x2="530" y2="138"/><line x1="40" y1="165" x2="530" y2="165"/>
+                <line x1="40" y1="192" x2="530" y2="192"/><line x1="40" y1="219" x2="530" y2="219"/>
+                <line x1="40" y1="246" x2="530" y2="246"/><line x1="40" y1="273" x2="530" y2="273"/>
+                <line x1="40" y1="30" x2="40" y2="280"/><line x1="94.5" y1="30" x2="94.5" y2="280"/>
+                <line x1="149" y1="30" x2="149" y2="280"/><line x1="203.5" y1="30" x2="203.5" y2="280"/>
+                <line x1="258" y1="30" x2="258" y2="280"/><line x1="312.5" y1="30" x2="312.5" y2="280"/>
+                <line x1="367" y1="30" x2="367" y2="280"/><line x1="421.5" y1="30" x2="421.5" y2="280"/>
+                <line x1="476" y1="30" x2="476" y2="280"/><line x1="530.5" y1="30" x2="530.5" y2="280"/>
+              </g>
+              
+              <line x1="40" y1="270" x2="530" y2="270" stroke="#475569" stroke-width="0.5" opacity="0.20"/>
+              <text x="285" y="298" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif" text-anchor="middle" opacity="0.18" letter-spacing="0.1em">COMMITMENT DURATION</text>
+              <text x="14" y="155" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif" text-anchor="middle" opacity="0.18" letter-spacing="0.1em" transform="rotate(-90,14,155)">PROJECTED RETURN</text>
+              
+              <!-- Bar 1: 3mo -->
+              <g class="plans-bar" style="animation-delay: 0.2s">
+                <polygon points="132,215 146,201 146,256 132,270" fill="url(#planSide)"/>
+                <polygon points="72,215 86,201 146,201 132,215" fill="url(#planTop)"/>
+                <rect x="72" y="215" width="60" height="55" rx="2" fill="url(#planBar1)"/>
+                <text x="102" y="286" fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.40">3mo</text>
+                <text x="102" y="237" fill="#cbd5e1" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle" opacity="0.55">0.8%</text>
+              </g>
+              <!-- Bar 2: 6mo -->
+              <g class="plans-bar" style="animation-delay: 0.4s">
+                <polygon points="218,185 232,171 232,256 218,270" fill="url(#planSide)"/>
+                <polygon points="158,185 172,171 232,171 218,185" fill="url(#planTop)"/>
+                <rect x="158" y="185" width="60" height="85" rx="2" fill="url(#planBar2)"/>
+                <text x="188" y="286" fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.40">6mo</text>
+                <text x="188" y="207" fill="#cbd5e1" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle" opacity="0.55">1.0%</text>
+              </g>
+              <!-- Bar 3: 12mo -->
+              <g class="plans-bar" style="animation-delay: 0.6s">
+                <polygon points="304,150 318,136 318,256 304,270" fill="url(#planSide)"/>
+                <polygon points="244,150 258,136 318,136 304,150" fill="url(#planTop)"/>
+                <rect x="244" y="150" width="60" height="120" rx="2" fill="url(#planBar3)"/>
+                <text x="274" y="286" fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.40">12mo</text>
+                <text x="274" y="172" fill="#cbd5e1" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle" opacity="0.55">1.2%</text>
+              </g>
+              <!-- Bar 4: 24mo -->
+              <g class="plans-bar" style="animation-delay: 0.8s">
+                <polygon points="390,110 404,96 404,256 390,270" fill="url(#planSide)"/>
+                <polygon points="330,110 344,96 404,96 390,110" fill="url(#planTop)"/>
+                <rect x="330" y="110" width="60" height="160" rx="2" fill="url(#planBar4)"/>
+                <text x="360" y="286" fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.40">24mo</text>
+                <text x="360" y="132" fill="#cbd5e1" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle" opacity="0.55">1.4%</text>
+              </g>
+              <!-- Bar 5: 60mo -->
+              <g class="plans-bar" style="animation-delay: 1.0s">
+                <polygon points="476,60 490,46 490,256 476,270" fill="url(#planSide)"/>
+                <polygon points="416,60 430,46 490,46 476,60" fill="url(#planTop)"/>
+                <rect x="416" y="60" width="60" height="210" rx="2" fill="url(#planBar5)"/>
+                <text x="446" y="286" fill="#64748b" font-size="8.5" font-family="Inter,monospace" text-anchor="middle" opacity="0.40">60mo</text>
+                <text x="446" y="82" fill="#cbd5e1" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle" opacity="0.55">1.6%</text>
+              </g>
+              
+              <polyline points="102,203 188,173 274,138 360,98 446,48" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" fill="none" opacity="0.15" class="plans-trajectory"/>
+              
+              <circle cx="102" cy="203" r="2.5" fill="#94a3b8" opacity="0.25" class="plans-node"/>
+              <circle cx="188" cy="173" r="2.5" fill="#94a3b8" opacity="0.25" class="plans-node"/>
+              <circle cx="274" cy="138" r="2.5" fill="#94a3b8" opacity="0.25" class="plans-node"/>
+              <circle cx="360" cy="98" r="2.5" fill="#94a3b8" opacity="0.25" class="plans-node"/>
+              <circle cx="446" cy="48" r="2.5" fill="#94a3b8" opacity="0.25" class="plans-node"/>
+              
+              <g>
+                <rect x="404" y="26" width="84" height="30" rx="5" fill="#0f172a" stroke="#334155" stroke-width="0.6"/>
+                <text x="446" y="40" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif" text-anchor="middle" opacity="0.65">Longest duration</text>
+                <text x="446" y="51" fill="#e2e8f0" font-size="9" font-family="Inter,monospace" font-weight="600" text-anchor="middle">Highest ROI</text>
+              </g>
+              
+              <g>
+                <text x="528" y="310" fill="#475569" font-size="7" font-family="'Courier New',monospace" text-anchor="end" opacity="0.16">A = P × (1 + r)ⁿ</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compare Plans Section - CORRECTED WITH DAILY RATES -->
+  <section id="plans-section" class="py-16 lg:py-24 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">Compare plans</h2>
+        <p class="mt-4 text-slate-400">All plans use daily interest. Longer commitments earn higher rates — a standard approach in fixed-duration investing.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 108 Circle -->
+        <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 p-7 transition-shadow duration-200 hover:shadow-lg">
+          <h3 class="text-lg font-bold text-white">108 Circle</h3>
+          <p class="mt-1 text-sm text-slate-400 leading-relaxed">Entry-level investment circle. Perfect for new investors looking to start with a modest amount and earn steady returns.</p>
+          <div class="mt-6 pt-6 border-t border-slate-800">
+            <div class="flex items-baseline gap-1.5"><span class="text-3xl font-bold text-blue-500">200%</span><span class="text-sm text-slate-400 font-medium">/day</span></div>
+            <p class="mt-1 text-xs text-slate-500">Compound interest · 1 month lock-in</p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Duration</span><span class="text-sm font-semibold text-white">1 month</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Daily expected ROI</span><span class="text-sm font-semibold text-green-500">200%</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Investment range</span><span class="text-sm font-semibold text-white">$100 – $2,221</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Referral bonus</span><span class="text-sm font-semibold text-white">2.00%</span></div>
+          </div>
+          <div class="mt-6 bg-slate-800 rounded-xl p-4">
+            <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+            <div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-400">Maturity value</span><span class="text-base font-bold text-white">$610,000.00</span></div>
+            <div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-400">Projected profit</span><span class="text-sm font-semibold text-green-500">+$600,000.00</span></div>
+          </div>
+          <a href="/register" class="mt-6 block w-full text-center py-3 rounded-xl text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">Get Started</a>
+        </div>
+
+        <!-- 2222 Investment -->
+        <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 p-7 transition-shadow duration-200 hover:shadow-lg">
+          <h3 class="text-lg font-bold text-white">2222 Investment</h3>
+          <p class="mt-1 text-sm text-slate-400 leading-relaxed">Mid-tier plan with enhanced returns for growing portfolios. Ideal for investors stepping up their capital.</p>
+          <div class="mt-6 pt-6 border-t border-slate-800">
+            <div class="flex items-baseline gap-1.5"><span class="text-3xl font-bold text-blue-500">200%</span><span class="text-sm text-slate-400 font-medium">/day</span></div>
+            <p class="mt-1 text-xs text-slate-500">Compound interest · 1 month lock-in</p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Duration</span><span class="text-sm font-semibold text-white">1 month</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Daily expected ROI</span><span class="text-sm font-semibold text-green-500">200%</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Investment range</span><span class="text-sm font-semibold text-white">$2,222 – $7,999</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Referral bonus</span><span class="text-sm font-semibold text-white">3.00%</span></div>
+          </div>
+          <div class="mt-6 bg-slate-800 rounded-xl p-4">
+            <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+            <div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-400">Maturity value</span><span class="text-base font-bold text-white">$610,000.00</span></div>
+            <div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-400">Projected profit</span><span class="text-sm font-semibold text-green-500">+$600,000.00</span></div>
+          </div>
+          <a href="/register" class="mt-6 block w-full text-center py-3 rounded-xl text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">Get Started</a>
+        </div>
+
+        <!-- 8888 Investment (Popular) -->
+        <div class="group relative bg-slate-900 rounded-2xl border border-blue-500 p-7 transition-shadow duration-200 hover:shadow-lg">
+          <div class="absolute -top-3 left-7"><span class="inline-block bg-blue-600 text-white text-[10px] font-semibold tracking-[0.1em] uppercase px-3 py-1 rounded-full">Popular</span></div>
+          <div class="pt-2">
+            <h3 class="text-lg font-bold text-white">8888 Investment</h3>
+            <p class="mt-1 text-sm text-slate-400 leading-relaxed">Premium investment tier offering high-yield returns for serious investors with substantial capital.</p>
+          </div>
+          <div class="mt-6 pt-6 border-t border-slate-800">
+            <div class="flex items-baseline gap-1.5"><span class="text-3xl font-bold text-blue-500">300%</span><span class="text-sm text-slate-400 font-medium">/day</span></div>
+            <p class="mt-1 text-xs text-slate-500">Compound interest · 1 month lock-in</p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Duration</span><span class="text-sm font-semibold text-white">1 month</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Daily expected ROI</span><span class="text-sm font-semibold text-green-500">300%</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Investment range</span><span class="text-sm font-semibold text-white">$8,000 – $14,999</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Referral bonus</span><span class="text-sm font-semibold text-white">4.00%</span></div>
+          </div>
+          <div class="mt-6 bg-slate-800 rounded-xl p-4">
+            <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+            <div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-400">Maturity value</span><span class="text-base font-bold text-white">$910,000.00</span></div>
+            <div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-400">Projected profit</span><span class="text-sm font-semibold text-green-500">+$900,000.00</span></div>
+          </div>
+          <a href="/register" class="mt-6 block w-full text-center py-3 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors">Get Started</a>
+        </div>
+
+        <!-- Tier 3 Investment (Popular) -->
+        <div class="group relative bg-slate-900 rounded-2xl border border-blue-500 p-7 transition-shadow duration-200 hover:shadow-lg">
+          <div class="absolute -top-3 left-7"><span class="inline-block bg-blue-600 text-white text-[10px] font-semibold tracking-[0.1em] uppercase px-3 py-1 rounded-full">Popular</span></div>
+          <div class="pt-2">
+            <h3 class="text-lg font-bold text-white">Tier 3 Investment</h3>
+            <p class="mt-1 text-sm text-slate-400 leading-relaxed">Exclusive high-performance plan for experienced investors seeking aggressive growth with larger capital deployment.</p>
+          </div>
+          <div class="mt-6 pt-6 border-t border-slate-800">
+            <div class="flex items-baseline gap-1.5"><span class="text-3xl font-bold text-blue-500">350%</span><span class="text-sm text-slate-400 font-medium">/day</span></div>
+            <p class="mt-1 text-xs text-slate-500">Compound interest · 1 month lock-in</p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Duration</span><span class="text-sm font-semibold text-white">1 month</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Daily expected ROI</span><span class="text-sm font-semibold text-green-500">350%</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Investment range</span><span class="text-sm font-semibold text-white">$15,000 – $19,999</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Referral bonus</span><span class="text-sm font-semibold text-white">5.00%</span></div>
+          </div>
+          <div class="mt-6 bg-slate-800 rounded-xl p-4">
+            <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+            <div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-400">Maturity value</span><span class="text-base font-bold text-white">$1,060,000.00</span></div>
+            <div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-400">Projected profit</span><span class="text-sm font-semibold text-green-500">+$1,050,000.00</span></div>
+          </div>
+          <a href="/register" class="mt-6 block w-full text-center py-3 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors">Get Started</a>
+        </div>
+
+        <!-- Bitcoin Elite Group (Popular) -->
+        <div class="group relative bg-slate-900 rounded-2xl border border-blue-500 p-7 transition-shadow duration-200 hover:shadow-lg">
+          <div class="absolute -top-3 left-7"><span class="inline-block bg-blue-600 text-white text-[10px] font-semibold tracking-[0.1em] uppercase px-3 py-1 rounded-full">Popular</span></div>
+          <div class="pt-2">
+            <h3 class="text-lg font-bold text-white">Bitcoin Elite Group</h3>
+            <p class="mt-1 text-sm text-slate-400 leading-relaxed">The ultimate short-term, high-yield opportunity. Two-week accelerated investment cycle with maximum returns for elite investors.</p>
+          </div>
+          <div class="mt-6 pt-6 border-t border-slate-800">
+            <div class="flex items-baseline gap-1.5"><span class="text-3xl font-bold text-blue-500">750%</span><span class="text-sm text-slate-400 font-medium">/day</span></div>
+            <p class="mt-1 text-xs text-slate-500">Compound interest · 2 weeks lock-in</p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Duration</span><span class="text-sm font-semibold text-white">2 weeks</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Daily expected ROI</span><span class="text-sm font-semibold text-green-500">750%</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Investment range</span><span class="text-sm font-semibold text-white">$20,000 – $999,999,999</span></div>
+            <div class="h-px bg-slate-800"></div>
+            <div class="flex justify-between"><span class="text-sm text-slate-400">Referral bonus</span><span class="text-sm font-semibold text-white">5.00%</span></div>
+          </div>
+          <div class="mt-6 bg-slate-800 rounded-xl p-4">
+            <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+            <div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-400">Maturity value</span><span class="text-base font-bold text-white">$1,060,000.00</span></div>
+            <div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-400">Projected profit</span><span class="text-sm font-semibold text-green-500">+$1,050,000.00</span></div>
+          </div>
+          <a href="/register" class="mt-6 block w-full text-center py-3 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors">Get Started</a>
+        </div>
+      </div>
+
+      <p class="mt-10 text-center text-xs text-slate-500 max-w-3xl mx-auto leading-relaxed">
+        Projected returns are based on stated daily interest rates and are not guaranteed. All investments carry risk, including potential loss of principal.
+        <a href="/risk" class="text-blue-500 hover:underline">Read full risk disclosure</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- How Time Affects Returns -->
+  <section class="py-16 lg:py-24 bg-slate-900 border-y border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
+        <div class="lg:col-span-2">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white leading-tight">How time<br class="hidden sm:block"> affects returns</h2>
+          <div class="mt-6 h-1 w-12 bg-blue-500 rounded-full"></div>
+          <p class="mt-6 text-sm text-slate-400 leading-relaxed">All plans use <strong class="text-white">daily compound interest</strong> — your returns generate additional returns each day. Longer durations amplify this effect because compounding has more cycles to work.</p>
+        </div>
+        <div class="lg:col-span-3">
+          <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+            <div class="grid grid-cols-4 bg-slate-700/50 border-b border-slate-700 text-[11px] font-semibold text-slate-400 tracking-wide uppercase px-6 py-3.5">
+              <span>Plan</span><span class="text-right">Duration</span><span class="text-right">Daily Rate</span><span class="text-right">$10K becomes</span>
+            </div>
+            <div class="grid grid-cols-4 items-center px-6 py-4 border-b border-slate-700"><span class="text-sm font-semibold text-white">108 Circle</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">200%</span><span class="text-sm font-semibold text-green-500 text-right">$610,000</span></div>
+            <div class="grid grid-cols-4 items-center px-6 py-4 border-b border-slate-700"><span class="text-sm font-semibold text-white">2222 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">200%</span><span class="text-sm font-semibold text-green-500 text-right">$610,000</span></div>
+            <div class="grid grid-cols-4 items-center px-6 py-4 border-b border-slate-700 bg-slate-700/20"><span class="text-sm font-semibold text-white">8888 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">300%</span><span class="text-sm font-semibold text-green-500 text-right">$910,000</span></div>
+            <div class="grid grid-cols-4 items-center px-6 py-4 border-b border-slate-700 bg-slate-700/20"><span class="text-sm font-semibold text-white">Tier 3 Investment</span><span class="text-sm text-slate-400 text-right">1 month</span><span class="text-sm text-slate-400 text-right">350%</span><span class="text-sm font-semibold text-green-500 text-right">$1,060,000</span></div>
+            <div class="grid grid-cols-4 items-center px-6 py-4 bg-slate-700/20"><span class="text-sm font-semibold text-white">Bitcoin Elite Group</span><span class="text-sm text-slate-400 text-right">2 weeks</span><span class="text-sm text-slate-400 text-right">750%</span><span class="text-sm font-semibold text-green-500 text-right">$1,060,000</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How Returns Are Calculated -->
+  <section class="py-16 lg:py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">How returns are calculated</h2>
+        <p class="mt-4 text-slate-500">Every plan uses the same transparent formula. There is no discretionary adjustment, no performance-based markup, and no hidden layer.</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <h3 class="text-base font-semibold text-slate-900">Compound interest formula</h3>
+          <div class="mt-5 bg-white rounded-xl border border-slate-200 p-5 text-center"><p class="text-xl font-mono text-slate-900">A = P × (1 + r)<sup>n</sup></p></div>
+          <dl class="mt-6 space-y-3 text-sm"><div class="flex gap-3"><dt class="font-mono font-bold text-slate-700 w-6 shrink-0">A</dt><dd class="text-slate-500">Total amount at maturity (principal + profit)</dd></div><div class="flex gap-3"><dt class="font-mono font-bold text-slate-700 w-6 shrink-0">P</dt><dd class="text-slate-500">Your investment (principal)</dd></div><div class="flex gap-3"><dt class="font-mono font-bold text-slate-700 w-6 shrink-0">r</dt><dd class="text-slate-500">Daily rate as a decimal (e.g., 200% = 2.0)</dd></div><div class="flex gap-3"><dt class="font-mono font-bold text-slate-700 w-6 shrink-0">n</dt><dd class="text-slate-500">Number of compounding periods (days)</dd></div></dl>
+        </div>
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+          <h3 class="text-base font-semibold text-slate-900">Worked example</h3>
+          <p class="mt-3 text-sm text-slate-500 leading-relaxed">$10,000 invested in the 8888 Investment plan (300%/day, 30 days):</p>
+          <div class="mt-5 space-y-4">
+            <div class="bg-white rounded-xl border border-slate-200 p-4"><p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Step 1 — Convert rate</p><p class="mt-2 text-sm font-mono text-slate-700">r = 300 ÷ 100 = 3.0</p></div>
+            <div class="bg-white rounded-xl border border-slate-200 p-4"><p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Step 2 — Apply formula</p><p class="mt-2 text-sm font-mono text-slate-700">A = 10,000 × (1 + 3.0)<sup>30</sup></p></div>
+            <div class="bg-white rounded-xl border border-slate-200 p-4"><div class="mt-2 flex items-baseline justify-between"><span class="text-sm text-slate-500">Maturity value</span><span class="text-base font-bold text-slate-900">$910,000.00</span></div><div class="mt-1 flex items-baseline justify-between"><span class="text-sm text-slate-500">Projected profit</span><span class="text-sm font-semibold text-green-600">+$900,000.00</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What You Should Know -->
+  <section class="py-16 lg:py-24 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
+        <div class="lg:col-span-2">
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">What you<br class="hidden sm:block"> should know</h2>
+          <div class="mt-6 h-1 w-12 bg-amber-500 rounded-full"></div>
+          <p class="mt-6 text-sm text-slate-500 leading-relaxed">We publish this information because informed investors make better decisions. These are the realities of our platform, stated plainly.</p>
+        </div>
+        <div class="lg:col-span-3 space-y-5">
+          <div class="bg-white rounded-xl border border-slate-200 p-6"><div class="flex items-start gap-4"><div class="flex-shrink-0 w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center"><svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg></div><div><h3 class="text-sm font-semibold text-slate-900">Returns are projected, not guaranteed</h3><p class="mt-1.5 text-sm text-slate-500 leading-relaxed">Stated ROI rates are calculated using the published compound interest formula. They represent projected outcomes based on the plan's terms — not a promise of results. All investments carry risk.</p></div></div></div>
+          <div class="bg-white rounded-xl border border-slate-200 p-6"><div class="flex items-start gap-4"><div class="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></div><div><h3 class="text-sm font-semibold text-slate-900">Funds are locked for the full duration</h3><p class="mt-1.5 text-sm text-slate-500 leading-relaxed">When you invest in a plan, your capital is locked until the maturity date. Early withdrawal is not available. You should only invest money you do not need access to during the plan period.</p></div></div></div>
+          <div class="bg-white rounded-xl border border-slate-200 p-6"><div class="flex items-start gap-4"><div class="flex-shrink-0 w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center"><svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.745 3.745 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg></div><div><h3 class="text-sm font-semibold text-slate-900">Every transaction is audited</h3><p class="mt-1.5 text-sm text-slate-500 leading-relaxed">All deposits are manually verified by our operations team. Every financial transaction is logged with an immutable timestamp. You can view your complete transaction history in your dashboard at any time.</p></div></div></div>
+          <div class="bg-white rounded-xl border border-slate-200 p-6"><div class="flex items-start gap-4"><div class="flex-shrink-0 w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center"><svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg></div><div><h3 class="text-sm font-semibold text-slate-900">No hidden fees or charges</h3><p class="mt-1.5 text-sm text-slate-500 leading-relaxed">The rate you see is the rate that governs your returns. There are no management fees, no performance markups, and no withdrawal charges.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Investment Calculator CTA -->
+  <section class="py-16 lg:py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-slate-900 rounded-2xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <div class="p-8 lg:p-12 flex flex-col justify-center">
+            <p class="text-[11px] font-medium text-blue-400 tracking-[0.2em] uppercase">Investment Calculator</p>
+            <h2 class="mt-4 text-xl sm:text-2xl font-bold text-white leading-tight">See your projected returns before you commit</h2>
+            <p class="mt-4 text-sm text-slate-400 leading-relaxed">Enter any amount, select a plan, and see exactly how compound interest projects your returns over the full duration. No signup required.</p>
+            <div class="mt-8"><a href="/calculator" class="inline-flex items-center bg-white text-slate-900 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-100 transition-colors">Open Calculator <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></a></div>
+          </div>
+          <div class="bg-slate-800/50 p-8 lg:p-12 border-t lg:border-t-0 lg:border-l border-slate-700/50">
+            <div class="space-y-5">
+              <div><p class="text-[10px] font-medium text-slate-500 tracking-[0.15em] uppercase mb-2">Investment Amount</p><div class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3"><span class="text-lg font-bold text-white">$10,000</span></div></div>
+              <div><p class="text-[10px] font-medium text-slate-500 tracking-[0.15em] uppercase mb-2">Selected Plan</p><div class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-3"><span class="text-sm font-semibold text-white">8888 Investment</span><span class="text-xs text-slate-500 ml-2">1 month @ 300%/day</span></div></div>
+              <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-5 mt-2"><div class="flex items-baseline justify-between"><span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Projected Return</span><span class="text-xl font-bold text-white">$910,000.00</span></div><div class="mt-2 flex items-baseline justify-between"><span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Projected Profit</span><span class="text-sm font-semibold text-green-400">+$900,000.00</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 lg:py-20 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Start with a plan that fits your timeline</h2>
+      <p class="mt-4 text-slate-500 max-w-xl mx-auto">Create a free account, complete identity verification, and choose your plan. There is no obligation until you make your first deposit.</p>
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/register" class="inline-flex items-center bg-slate-900 text-white px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm">Create Your Account <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg></a>
+        <a href="/calculator" class="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">Try the Calculator →</a>
+      </div>
+      <p class="mt-6 text-xs text-slate-400">Free to join · No credit card required · Identity verification required before transacting</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-800 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+        <div><a href="/" class="text-xl font-extrabold tracking-tight text-white">XSpace<span class="text-blue-500">Finance</span></a><p class="mt-4 text-sm text-slate-400 leading-relaxed">Fixed-duration investment plans with transparent returns. Serving individual investors in the United States, United Kingdom, and Canada.</p></div>
+        <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Platform</h4><ul class="space-y-3 text-sm text-slate-400"><li><a href="/plans" class="hover:text-white transition-colors">Investment Plans</a></li><li><a href="/calculator" class="hover:text-white transition-colors">ROI Calculator</a></li><li><a href="/about" class="hover:text-white transition-colors">About Us</a></li><li><a href="/register" class="hover:text-white transition-colors">Create Account</a></li></ul></div>
+        <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Legal</h4><ul class="space-y-3 text-sm text-slate-400"><li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li><li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li><li><a href="/risk" class="hover:text-white transition-colors">Risk Disclosure</a></li><li><a href="/cookies" class="hover:text-white transition-colors">Cookie Policy</a></li></ul></div>
+        <div><h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Countries</h4><ul class="space-y-3 text-sm text-slate-400"><li class="flex items-center gap-2"><span class="w-5 h-auto">🇺🇸</span> United States</li><li class="flex items-center gap-2"><span class="w-5 h-auto">🇬🇧</span> United Kingdom</li><li class="flex items-center gap-2"><span class="w-5 h-auto">🇨🇦</span> Canada</li></ul></div>
+      </div>
+      <div class="border-t border-slate-800 mt-12 pt-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm"><p class="text-slate-500">© 2026 XSpaceFinance. All rights reserved.</p><p class="text-slate-500 text-xs text-center md:text-right max-w-lg">All investments carry risk. Projected returns are based on stated rates and are not guaranteed. Past performance does not guarantee future results.</p></div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!-- Top Bar with User Dropdown + Hamburger -->
+<div class="topbar">
+  <div class="flex items-center gap-3">
+    <!-- Hamburger button (mobile) -->
+    <button id="sidebarToggle" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 transition" aria-label="Toggle sidebar">
+      <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+
+    <div>
+      <!-- Page title (Dashboard) -->
+      <h1 class="text-sm font-medium text-slate-400 uppercase tracking-wider"><%= title %></h1>
+      <!-- Greeting – bold and prominent -->
+      <div class="flex items-center gap-3 mt-0.5">
+        <span id="greeting" class="text-xl font-bold text-slate-800"></span>
+        <span class="text-xs text-slate-400 hidden sm:inline">·</span>
+        <span id="localDate" class="text-xs text-slate-500 hidden sm:inline"></span>
+        <span id="localTime" class="text-xs font-mono text-slate-500"></span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex items-center gap-4">
+    <!-- User Dropdown (unchanged) -->
+    <div class="relative" id="userDropdown">
+      <button id="userDropdownBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+          <span class="text-blue-600 font-semibold text-sm"><%= user?.first_name?.charAt(0) || 'U' %></span>
+        </div>
+        <div class="hidden sm:block text-left">
+          <p class="text-sm font-medium text-slate-700"><%= user?.first_name %> <%= user?.last_name %></p>
+          <p class="text-xs text-slate-400"><%= user?.email %></p>
+        </div>
+        <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+        </svg>
+      </button>
+      
+      <div id="userDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden z-50 hidden">
+        <div class="px-4 py-3 border-b border-slate-100">
+          <p class="text-sm font-semibold text-slate-800 truncate"><%= user?.first_name %> <%= user?.last_name %></p>
+          <p class="text-xs text-slate-500 truncate"><%= user?.email %></p>
+        </div>
+        <div class="py-1">
+          <a href="/dashboard/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">Profile & Security</a>
+          <a href="/dashboard/notifications" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">Notifications</a>
+        </div>
+        <div class="border-t border-slate-100 py-1">
+          <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ===== USER DROPDOWN =====
+    const userBtn = document.getElementById('userDropdownBtn');
+    const userMenu = document.getElementById('userDropdownMenu');
+    if (userBtn && userMenu) {
+      const newUserBtn = userBtn.cloneNode(true);
+      userBtn.parentNode.replaceChild(newUserBtn, userBtn);
+      const newUserMenu = userMenu.cloneNode(true);
+      userMenu.parentNode.replaceChild(newUserMenu, userMenu);
+      newUserBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        newUserMenu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!newUserBtn.contains(e.target) && !newUserMenu.contains(e.target)) {
+          newUserMenu.classList.add('hidden');
+        }
+      });
+    }
+
+    // ===== SIDEBAR TOGGLE (mobile) =====
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('dashboardSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('sidebarClose');
+
+    if (toggleBtn && sidebar && overlay) {
+      function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      toggleBtn.addEventListener('click', openSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) closeSidebar();
+      });
+    }
+
+    // ===== DYNAMIC GREETING & LOCAL DATE/TIME =====
+    function updateGreetingAndTime() {
+      const now = new Date();
+      const hours = now.getHours();
+      let greeting = '';
+      if (hours < 12) greeting = 'Good morning';
+      else if (hours < 18) greeting = 'Good afternoon';
+      else greeting = 'Good evening';
+
+      const firstName = '<%= user?.first_name || 'Investor' %>';
+      const greetingEl = document.getElementById('greeting');
+      if (greetingEl) greetingEl.textContent = `${greeting}, ${firstName}`;
+
+      const dateEl = document.getElementById('localDate');
+      if (dateEl) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString(undefined, options);
+      }
+
+      const timeEl = document.getElementById('localTime');
+      if (timeEl) {
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        timeEl.textContent = now.toLocaleTimeString(undefined, timeOptions);
+      }
+    }
+
+    updateGreetingAndTime();
+    setInterval(updateGreetingAndTime, 30000);
+  })();
+</script>

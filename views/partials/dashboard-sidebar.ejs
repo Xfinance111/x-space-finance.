@@ -1,0 +1,95 @@
+<aside class="w-64 bg-white border-r border-slate-200 min-h-screen fixed">
+  <div class="p-5 border-b border-slate-100">
+    <a href="/dashboard" class="text-xl font-bold text-slate-800">XSpace<span class="text-blue-600">Finance</span></a>
+    <p class="text-[10px] text-slate-400 mt-1 uppercase"><%= user?.currency || 'USD' %> Account</p>
+  </div>
+  <nav class="p-3 space-y-1">
+    <!-- Overview -->
+    <p class="sidebar-section-label">Overview</p>
+    <a href="/dashboard" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6Z"/>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+    
+    <!-- Investing -->
+    <p class="sidebar-section-label mt-4">Investing</p>
+    <a href="/dashboard/investments" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22"/>
+      </svg>
+      <span>My Investments</span>
+    </a>
+    <a href="/dashboard/active-plans" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <span>Active Plans</span>
+    </a>
+    <a href="/dashboard/new-investment" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 4.5v15m7.5-7.5h-15"/>
+      </svg>
+      <span>New Investment</span>
+    </a>
+    <a href="/dashboard/calculator" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Z"/>
+      </svg>
+      <span>Calculator</span>
+    </a>
+    
+    <!-- Funds -->
+    <p class="sidebar-section-label mt-4">Funds</p>
+    <a href="/dashboard/deposits" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5"/>
+      </svg>
+      <span>Deposits</span>
+    </a>
+    <a href="/dashboard/withdrawals" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3"/>
+      </svg>
+      <span>Withdrawals</span>
+    </a>
+    <a href="/dashboard/transactions" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25"/>
+      </svg>
+      <span>Transactions</span>
+    </a>
+    
+    <!-- Account -->
+    <p class="sidebar-section-label mt-4">Account</p>
+    <a href="/dashboard/profile" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+    <a href="/dashboard/notifications" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022"/>
+      </svg>
+      <span>Notifications</span>
+    </a>
+    <a href="/dashboard/activity-log" class="sidebar-link">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <span>Activity Log</span>
+    </a>
+    
+    <div class="border-t border-slate-200 my-4"></div>
+    
+    <!-- Sign Out -->
+    <a href="/logout" class="sidebar-link text-red-500 hover:bg-red-50">
+      <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15"/>
+      </svg>
+      <span>Sign Out</span>
+    </a>
+  </nav>
+</aside>

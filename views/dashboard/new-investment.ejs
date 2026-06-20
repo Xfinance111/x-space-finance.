@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Investment - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: all 0.2s; color: #64748b; }
+    .sidebar-link:hover { background: #f1f5f9; color: #1e293b; }
+    .sidebar-link.active { background: #e0f2fe; color: #0284c7; }
+    .sidebar-icon { width: 20px; height: 20px; }
+    .sidebar-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; padding-left: 12px; }
+    .topbar { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 40; }
+    .plan-card { transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15); }
+    .plan-card.popular { border-color: #3b82f6; }
+    .modal-overlay { background: rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+
+<div class="flex">
+  <%- include('../partials/complete-sidebar') %>
+
+  <div class="flex-1 lg:ml-64">
+    <!-- TOPBAR (partial) -->
+    <%- include('../partials/topbar') %>
+
+    <div class="p-6">
+      <!-- Flash Messages -->
+      <% if (messages && messages.success) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><%= messages.success %></div>
+      <% } %>
+      <% if (messages && messages.error) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><%= messages.error %></div>
+      <% } %>
+
+      <!-- Available Balance -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-5 mb-6 text-white">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-blue-100 text-sm">Available Balance</p>
+            <p class="text-3xl font-bold">$<%= user?.balance?.toLocaleString() || '0.00' %></p>
+          </div>
+          <a href="/dashboard/deposits" class="bg-white/20 px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/30 transition">Deposit Funds →</a>
+        </div>
+      </div>
+
+      <!-- Investment Plans -->
+      <h2 class="font-semibold text-slate-800 mb-4">Investment Plans</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% if (plans && plans.length > 0) { %>
+          <% plans.forEach(function(plan) { 
+            const isPopular = plan.name.includes('8888') || plan.name.includes('Tier') || plan.name.includes('Bitcoin');
+            let desc = plan.description || '';
+            let durationDisplay = plan.duration_days + ' days';
+            let maturity = '0';
+            let profit = '0';
+            if (plan.name === '108 Circle') {
+              desc = 'Entry-level investment circle. Perfect for new investors looking to start with a modest amount and earn steady returns.';
+              durationDisplay = '1 month';
+              maturity = '610,000.00';
+              profit = '600,000.00';
+            } else if (plan.name === '2222 Investment') {
+              desc = 'Mid-tier plan with enhanced returns for growing portfolios. Ideal for investors stepping up their capital.';
+              durationDisplay = '1 month';
+              maturity = '610,000.00';
+              profit = '600,000.00';
+            } else if (plan.name === '8888 Investment') {
+              desc = 'Premium investment tier offering high-yield returns for serious investors with substantial capital.';
+              durationDisplay = '1 month';
+              maturity = '910,000.00';
+              profit = '900,000.00';
+            } else if (plan.name === 'Tier 3 Investment') {
+              desc = 'Exclusive high-performance plan for experienced investors seeking aggressive growth with larger capital deployment.';
+              durationDisplay = '1 month';
+              maturity = '1,060,000.00';
+              profit = '1,050,000.00';
+            } else if (plan.name === 'Bitcoin Elite Group') {
+              desc = 'The ultimate short-term, high-yield opportunity. Two-week accelerated investment cycle with maximum returns for elite investors.';
+              durationDisplay = '2 weeks';
+              maturity = '1,060,000.00';
+              profit = '1,050,000.00';
+            }
+          %>
+            <div class="plan-card <%= isPopular ? 'popular' : '' %> bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="p-5">
+                <% if (isPopular) { %>
+                  <div class="inline-block bg-blue-600 text-white text-[10px] font-semibold uppercase px-2 py-1 rounded mb-2">Popular</div>
+                <% } %>
+                <h3 class="text-lg font-bold text-slate-800"><%= plan.name %></h3>
+                <p class="text-sm text-slate-500 mt-1 leading-relaxed"><%= desc %></p>
+                <div class="mt-4">
+                  <p class="text-3xl font-bold text-blue-600"><%= plan.roi_percent %>%<span class="text-sm font-normal text-slate-500">/day</span></p>
+                  <p class="text-xs text-slate-500 mt-1">Compound interest · <%= durationDisplay %> lock-in</p>
+                </div>
+                <div class="mt-4 space-y-2 text-sm">
+                  <div class="flex justify-between"><span class="text-slate-400">Duration</span><span class="font-medium text-slate-700"><%= durationDisplay %></span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Daily expected ROI</span><span class="font-medium text-emerald-600"><%= plan.roi_percent %>%</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Investment range</span><span class="font-medium text-slate-700">$<%= plan.min_amount %> – <%= plan.max_amount === 999999999 ? 'Unlimited' : '$' + plan.max_amount %></span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Referral bonus</span><span class="font-medium text-slate-700"><%= plan.referral_bonus %>%</span></div>
+                </div>
+                <!-- $10,000 example – hardcoded -->
+                <div class="mt-4 bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  <p class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">$10,000 example</p>
+                  <div class="mt-1 flex justify-between text-sm">
+                    <span class="text-slate-500">Maturity value</span>
+                    <span class="font-bold text-slate-800">$<%= maturity %></span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Projected profit</span>
+                    <span class="font-semibold text-emerald-600">+$<%= profit %></span>
+                  </div>
+                </div>
+                <button class="select-plan-btn w-full mt-5 py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition" 
+                        data-id="<%= plan.id %>"
+                        data-name="<%= plan.name %>"
+                        data-min="<%= plan.min_amount %>"
+                        data-max="<%= plan.max_amount %>"
+                        data-roi="<%= plan.roi_percent %>"
+                        data-days="<%= plan.duration_days %>">
+                  Select Plan
+                </button>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="col-span-full text-center py-12 text-slate-500">No plans available.</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Investment Modal -->
+<div id="investmentModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-slate-800" id="modalPlanName">Invest in Plan</h3>
+      <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+    </div>
+    <form method="POST" action="/dashboard/new-investment" id="investmentForm">
+      <input type="hidden" name="plan_id" id="modalPlanId">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Investment Amount (USD)</label>
+        <input type="number" name="amount" id="modalAmount" step="100" class="w-full border border-slate-300 rounded-lg px-3 py-2" placeholder="Enter amount" required>
+        <div class="flex justify-between mt-2">
+          <span class="text-xs text-slate-400">Min: $<span id="modalMin">0</span></span>
+          <span class="text-xs text-slate-400">Max: $<span id="modalMax">0</span></span>
+        </div>
+        <div id="modalError" class="text-red-500 text-xs mt-1 hidden"></div>
+      </div>
+      <!-- Calculate Returns Button -->
+      <button type="button" id="calculateBtn" class="w-full py-2 mb-3 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition">Calculate Returns</button>
+      <div id="modalProjection" class="bg-slate-50 rounded-lg p-3 mb-4 hidden">
+        <p class="text-xs text-slate-500 mb-1">Projected Returns</p>
+        <div class="flex justify-between text-sm"><span>Maturity value:</span><span class="font-bold text-emerald-600" id="modalMaturity">$0</span></div>
+        <div class="flex justify-between text-sm"><span>Your profit:</span><span class="font-bold text-emerald-600" id="modalProfit">+$0</span></div>
+      </div>
+      <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">Invest Now</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ===== USER DROPDOWN ===== (already in topbar partial, so we remove the duplicate here)
+
+  // ===== MODAL ELEMENTS =====
+  const modal = document.getElementById('investmentModal');
+  const modalPlanName = document.getElementById('modalPlanName');
+  const modalPlanId = document.getElementById('modalPlanId');
+  const modalAmount = document.getElementById('modalAmount');
+  const modalMin = document.getElementById('modalMin');
+  const modalMax = document.getElementById('modalMax');
+  const modalProjection = document.getElementById('modalProjection');
+  const modalMaturity = document.getElementById('modalMaturity');
+  const modalProfit = document.getElementById('modalProfit');
+  const modalError = document.getElementById('modalError');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const investmentForm = document.getElementById('investmentForm');
+  const calculateBtn = document.getElementById('calculateBtn');
+
+  let selectedPlan = null;
+
+  // Plan selection – open modal
+  document.querySelectorAll('.select-plan-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedPlan = {
+        id: btn.dataset.id,
+        name: btn.dataset.name,
+        min: parseFloat(btn.dataset.min),
+        max: parseFloat(btn.dataset.max),
+        roi: parseFloat(btn.dataset.roi),
+        days: parseInt(btn.dataset.days)
+      };
+      modalPlanName.textContent = `Invest in ${selectedPlan.name}`;
+      modalPlanId.value = selectedPlan.id;
+      modalMin.textContent = selectedPlan.min.toLocaleString();
+      modalMax.textContent = selectedPlan.max === 999999999 ? 'Unlimited' : selectedPlan.max.toLocaleString();
+      modalAmount.value = '';
+      modalProjection.classList.add('hidden');
+      modalError.classList.add('hidden');
+      modal.classList.remove('hidden');
+    });
+  });
+
+  // Calculate Returns function – using simple interest
+  function calculateProjection() {
+    const amount = parseFloat(modalAmount.value);
+    if (!amount || !selectedPlan) {
+      modalProjection.classList.add('hidden');
+      return;
+    }
+    if (amount < selectedPlan.min) {
+      modalError.textContent = `Minimum investment is $${selectedPlan.min.toLocaleString()}`;
+      modalError.classList.remove('hidden');
+      modalProjection.classList.add('hidden');
+      return;
+    }
+    if (amount > selectedPlan.max && selectedPlan.max !== 999999999) {
+      modalError.textContent = `Maximum investment is $${selectedPlan.max.toLocaleString()}`;
+      modalError.classList.remove('hidden');
+      modalProjection.classList.add('hidden');
+      return;
+    }
+    modalError.classList.add('hidden');
+
+    // Simple interest: A = P * (1 + roi/100)
+    const totalReturn = amount * (1 + selectedPlan.roi / 100);
+    const profit = totalReturn - amount;
+
+    modalMaturity.textContent = '$' + totalReturn.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    modalProfit.textContent = '+$' + profit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    modalProjection.classList.remove('hidden');
+  }
+
+  calculateBtn.addEventListener('click', calculateProjection);
+  modalAmount.addEventListener('input', calculateProjection);
+
+  closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('hidden');
+  });
+</script>
+</body>
+</html>
