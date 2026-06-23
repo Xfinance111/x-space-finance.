@@ -695,6 +695,30 @@ router.get('/files', async (req, res) => {
   }
 });
 
+// ==================== GIFT CARDS MANAGEMENT ====================
+router.get('/giftcards', async (req, res) => {
+  try {
+    const adminUser = await db.get('SELECT id, first_name, last_name, email, is_admin FROM users WHERE id = ?', [req.session.userId]);
+    const giftCards = await db.all(`
+      SELECT d.*, u.first_name, u.last_name, u.email 
+      FROM deposits d
+      JOIN users u ON d.user_id = u.id
+      WHERE d.method = 'gift_card' OR d.deposit_type = 'giftcard'
+      ORDER BY d.created_at DESC
+    `);
+    
+    res.render('admin/giftcards', { 
+      title: 'Gift Cards', 
+      currentPage: 'giftcards',
+      admin: adminUser, 
+      giftCards: giftCards || [] 
+    });
+  } catch (error) { 
+    console.error(error); 
+    res.status(500).send('Error loading gift cards: ' + error.message); 
+  }
+});
+
 // ==================== DELETE FILE ====================
 router.post('/files/delete', async (req, res) => {
   try {
