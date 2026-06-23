@@ -351,18 +351,21 @@ router.post('/user/:id/reset-password', async (req, res) => {
   }
 });
 
-// Delete User Account (Admin)
-router.delete('/user/:id/delete', async (req, res) => {
+// ==================== DELETE USER (POST) ====================
+router.post('/user/:id/delete', async (req, res) => {
   try {
     const userId = req.params.id;
     if (parseInt(userId) === req.session.userId) {
-      return res.status(400).json({ success: false, error: 'Cannot delete your own account' });
+      req.flash('error', 'Cannot delete your own account');
+      return res.redirect('/admin/users');
     }
     await db.run('DELETE FROM users WHERE id = ?', [userId]);
-    res.json({ success: true, message: 'User deleted successfully' });
+    req.flash('success', 'User deleted successfully');
+    res.redirect('/admin/users');
   } catch (error) { 
     console.error('User delete error:', error);
-    res.status(500).json({ success: false, error: error.message }); 
+    req.flash('error', 'Failed to delete user');
+    res.redirect('/admin/users');
   }
 });
 
@@ -685,8 +688,8 @@ router.get('/files', async (req, res) => {
   }
 });
 
-// ==================== DELETE FILE ====================
-router.delete('/files/delete', async (req, res) => {
+// ==================== DELETE FILE (POST) ====================
+router.post('/files/delete', async (req, res) => {
   try {
     const { filePath, fileName, type } = req.body;
     
