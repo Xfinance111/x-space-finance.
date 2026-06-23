@@ -48,7 +48,8 @@ router.get('/', async (req, res) => {
 
     const user = await db.get(
       `SELECT id, first_name, last_name, email, balance, currency, 
-              kyc_status, referral_code, email_verified, created_at, is_admin
+              kyc_status, referral_code, email_verified, created_at, is_admin,
+              COALESCE(realized, 0) as realized
        FROM users WHERE id = ?`,
       [userId]
     );
@@ -97,9 +98,9 @@ router.get('/', async (req, res) => {
       totalExpectedReturn += expected;
     });
 
-    // Realized returns from matured investments only (admin adjustment coming later)
+    // Realized returns = admin-adjusted realized + matured returns
     const maturedReturn = maturedInvestments.reduce((sum, inv) => sum + parseFloat(inv.total_return || 0), 0);
-    const realizedReturn = maturedReturn;
+    const realizedReturn = parseFloat(user.realized || 0) + maturedReturn;
 
     portfolioValue = availableBalance + totalInvested;
 
