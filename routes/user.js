@@ -537,33 +537,57 @@ router.get('/transactions', async (req, res) => {
   }
 });
 
-// ==================== PROFILE ====================
+// ==================== PROFILE - FIXED ====================
 router.get('/profile', async (req, res) => {
   try {
     const userId = req.session.userId;
+    
+    if (!userId) {
+      req.flash('error', 'Please login first');
+      return res.redirect('/signin');
+    }
+    
+    // FIX: Use $1 instead of ?
     const user = await db.get(
-      'SELECT id, first_name, last_name, email, balance, currency, created_at, phone, dob, address, address2, city, state, postal_code, country, kyc_status, referral_code FROM users WHERE id = ?',
+      `SELECT id, first_name, last_name, email, balance, currency, 
+              created_at, phone, dob, address, address2, city, state, 
+              postal_code, country, kyc_status, referral_code 
+       FROM users WHERE id = $1`,
       [userId]
     );
-    res.render('dashboard/profile', { title: 'Profile', user });
+    
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/dashboard');
+    }
+    
+    // ✅ RENDER the profile page
+    res.render('dashboard/profile', { 
+      title: 'My Profile', 
+      user: user,
+      messages: req.flash()
+    });
+    
   } catch (error) {
     console.error('Profile error:', error);
-    res.status(500).send('Error loading profile');
+    req.flash('error', 'Error loading profile: ' + error.message);
+    res.redirect('/dashboard');
   }
 });
 
-// ==================== PROFILE UPDATE (POST) ====================
+// ==================== PROFILE UPDATE (POST) - FIXED ====================
 router.post('/profile/update', async (req, res) => {
   try {
     const userId = req.session.userId;
     const { first_name, last_name, phone, dob, address, address2, city, state, postal_code, country } = req.body;
 
-    await db.run(`
+    // FIX: Use $1, $2 etc instead of ?
+    await db.query(`
       UPDATE users SET
-        first_name = ?, last_name = ?, phone = ?, dob = ?,
-        address = ?, address2 = ?, city = ?, state = ?,
-        postal_code = ?, country = ?
-      WHERE id = ?
+        first_name = $1, last_name = $2, phone = $3, dob = $4,
+        address = $5, address2 = $6, city = $7, state = $8,
+        postal_code = $9, country = $10
+      WHERE id = $11
     `, [first_name, last_name, phone, dob, address, address2, city, state, postal_code, country, userId]);
 
     req.flash('success', 'Profile updated successfully');
@@ -575,7 +599,7 @@ router.post('/profile/update', async (req, res) => {
   }
 });
 
-// ==================== CHANGE PASSWORD ====================
+// ==================== CHANGE PASSWORD - FIXED ====================
 router.post('/change-password', async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -590,7 +614,8 @@ router.post('/change-password', async (req, res) => {
       return res.redirect('/dashboard/profile');
     }
 
-    const user = await db.get('SELECT password FROM users WHERE id = ?', [userId]);
+    // FIX: Use $1 instead of ?
+    const user = await db.get('SELECT password FROM users WHERE id = $1', [userId]);
     if (!user) {
       req.flash('error', 'User not found');
       return res.redirect('/dashboard/profile');
@@ -603,12 +628,13 @@ router.post('/change-password', async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(new_password, 10);
-    await db.run('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
+    await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, userId]);
 
     try {
-      await db.run(`
+      // FIX: Use NOW() instead of CURRENT_TIMESTAMP
+      await db.query(`
         INSERT INTO activity_log (user_id, action, type, description, created_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        VALUES ($1, $2, $3, $4, NOW())
       `, [userId, 'password_change', 'security', 'Changed password']);
     } catch (e) {}
 
