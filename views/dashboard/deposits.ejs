@@ -23,6 +23,64 @@
     .form-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; font-size: 14px; transition: all 0.2s; }
     .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
     .form-label { display: block; font-size: 13px; font-weight: 500; color: #1e293b; margin-bottom: 6px; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Drag & Drop Styles */
+    .drop-zone {
+      border: 2px dashed #e2e8f0;
+      border-radius: 12px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #fafbfc;
+    }
+    .drop-zone:hover {
+      border-color: #3b82f6;
+      background: #f0f7ff;
+    }
+    .drop-zone.dragover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      transform: scale(1.02);
+    }
+    .drop-zone .file-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    .drop-zone .file-info {
+      font-size: 14px;
+      color: #64748b;
+    }
+    .drop-zone .file-name {
+      font-weight: 600;
+      color: #1e293b;
+      word-break: break-all;
+    }
+    .drop-zone .file-size {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .drop-zone .remove-file {
+      color: #ef4444;
+      cursor: pointer;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .drop-zone .remove-file:hover {
+      text-decoration: underline;
+    }
+    .drop-zone.has-file {
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .drop-zone .browse-link {
+      color: #3b82f6;
+      font-weight: 500;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -54,13 +112,14 @@
               <p class="text-xs text-slate-500">UK bank transfer – Barclays</p>
             </div>
             <div class="p-6 space-y-3 text-sm">
-              <div class="flex justify-between"><span class="text-slate-500">Bank</span><span class="font-medium text-slate-700">Barclays Bank</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Bank</span><span class="font-medium text-slate-700">Barclays UK</span></div>
               <div class="flex justify-between"><span class="text-slate-500">Account Name</span><span class="font-medium text-slate-700">XSpaceFinance Ltd.</span></div>
               <div class="flex justify-between"><span class="text-slate-500">Account Number</span><span class="font-medium text-slate-700">12345678</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Sort Code</span><span class="font-medium text-slate-700">12-34-56</span></div>
               <div class="flex justify-between"><span class="text-slate-500">SWIFT</span><span class="font-medium text-slate-700">BARCGB22</span></div>
-              <div class="flex justify-between"><span class="text-slate-500">IBAN</span><span class="font-medium text-slate-700">GB29 BARC 2000 0012 3456 78</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">IBAN</span><span class="font-medium text-slate-700">GB12BARC12345678901234</span></div>
               <div class="mt-2 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-                <span class="font-medium">📌 Include your reference code</span> in the payment reference.
+                <span class="font-medium">📌 Note:</span> Please use your registered email as reference.
               </div>
             </div>
           </div>
@@ -69,16 +128,15 @@
           <div class="deposit-card">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
               <h3 class="font-semibold text-slate-800">🎁 Gift Card</h3>
-              <p class="text-xs text-slate-500">Apple gift card – upload code</p>
+              <p class="text-xs text-slate-500">Apple gift card – upload code or image</p>
             </div>
             <div class="p-6 space-y-3 text-sm">
-              <div class="flex justify-between"><span class="text-slate-500">Account Name</span><span class="font-medium text-slate-700">Apple gift card</span></div>
-              <div class="flex justify-between"><span class="text-slate-500">Account Number</span><span class="font-medium text-slate-700">1-</span></div>
-              <div class="flex justify-between"><span class="text-slate-500">Routing</span><span class="font-medium text-slate-700">5</span></div>
-              <div class="mt-2">
-                <button id="giftCardUploadBtn" class="text-xs text-blue-600 hover:underline">Click below to upload</button>
-                <input type="file" id="giftCardFile" class="hidden" accept="image/*,.pdf">
+              <p class="text-slate-600">Upload your gift card code or screenshot here. It will be reviewed by our team.</p>
+              <div class="flex items-center gap-3">
+                <button type="button" id="giftCardUploadBtn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition">Choose File</button>
+                <span id="giftCardFileName" class="text-sm text-slate-500">No file selected</span>
               </div>
+              <input type="file" id="giftCardFileInput" class="hidden" accept="image/*,.pdf">
             </div>
           </div>
 
@@ -91,17 +149,17 @@
             <div class="p-6 space-y-5">
               <!-- Crypto options – BTC, ETH, SOL only -->
               <div class="grid grid-cols-3 gap-2">
-                <button class="crypto-option active p-3 rounded-xl border border-slate-200 text-center" data-coin="BTC">
+                <button type="button" class="crypto-option active p-3 rounded-xl border border-slate-200 text-center" data-coin="BTC">
                   <div class="text-2xl">₿</div>
                   <div class="font-bold text-sm text-slate-800">BTC</div>
                   <div class="text-[10px] text-slate-400">Bitcoin</div>
                 </button>
-                <button class="crypto-option p-3 rounded-xl border border-slate-200 text-center" data-coin="ETH">
+                <button type="button" class="crypto-option p-3 rounded-xl border border-slate-200 text-center" data-coin="ETH">
                   <div class="text-2xl">Ξ</div>
                   <div class="font-bold text-sm text-slate-800">ETH</div>
                   <div class="text-[10px] text-slate-400">Ethereum</div>
                 </button>
-                <button class="crypto-option p-3 rounded-xl border border-slate-200 text-center" data-coin="SOL">
+                <button type="button" class="crypto-option p-3 rounded-xl border border-slate-200 text-center" data-coin="SOL">
                   <div class="text-2xl">◎</div>
                   <div class="font-bold text-sm text-slate-800">SOL</div>
                   <div class="text-[10px] text-slate-400">Solana</div>
@@ -116,7 +174,7 @@
                     <p class="text-xs text-slate-500 text-center">Wallet Address</p>
                     <div class="flex items-center gap-2 mt-1">
                       <input type="text" id="walletAddress" readonly class="form-input bg-white text-xs font-mono text-slate-700 flex-1" value="bc1qtpfcvuvt2nm6dastam8rnmt1m8v7tun9aacjup">
-                      <button onclick="copyAddress()" class="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs hover:bg-slate-300 transition">Copy</button>
+                      <button type="button" onclick="copyAddress()" class="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs hover:bg-slate-300 transition">Copy</button>
                     </div>
                   </div>
                 </div>
@@ -127,24 +185,74 @@
 
         <!-- RIGHT COLUMN – Deposit Form -->
         <div>
-          <form action="/dashboard/deposits" method="POST" enctype="multipart/form-data" class="deposit-card">
+          <form action="/dashboard/deposits" method="POST" enctype="multipart/form-data" class="deposit-card" id="depositForm">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
               <h3 class="font-semibold text-slate-800">Deposit Details</h3>
               <p class="text-xs text-slate-500">Fill in the amount and attach proof</p>
             </div>
             <div class="p-6 space-y-5">
-              <!-- Amount -->
+              <!-- Deposit Method Selection -->
               <div>
-                <label class="form-label">Deposit Amount</label>
-                <input type="number" name="amount" step="0.01" class="form-input" placeholder="Enter amount" required>
+                <label class="form-label">Deposit Method</label>
+                <select name="method" id="depositMethodSelect" class="form-input" required>
+                  <option value="bank_transfer">🏦 Bank Transfer</option>
+                  <option value="gift_card">🎁 Gift Card</option>
+                  <option value="crypto">₿ Cryptocurrency</option>
+                </select>
               </div>
 
-              <!-- Payment Proof -->
+              <!-- Amount -->
               <div>
-                <label class="form-label">Payment Proof (Optional)</label>
-                <input type="file" name="proof" accept="image/*,.pdf" class="form-input p-2">
-                <p class="text-xs text-slate-400 mt-1">Upload screenshot or receipt. Max 5MB. JPG, PNG, or PDF.</p>
+                <label class="form-label">Deposit Amount ($)</label>
+                <input type="number" name="amount" step="0.01" class="form-input" placeholder="Enter amount" min="1" required>
               </div>
+
+              <!-- Gift Card Code (only for gift card) -->
+              <div id="giftCardCodeField" style="display: none;">
+                <label class="form-label">Gift Card Code</label>
+                <input type="text" name="gift_card_code" class="form-input" placeholder="Enter gift card code">
+                <p class="text-xs text-slate-400 mt-1">Enter the gift card code or upload a screenshot below.</p>
+              </div>
+
+              <!-- Gift Card File Upload -->
+              <div id="giftCardUploadField" style="display: none;">
+                <label class="form-label">Gift Card Proof</label>
+                <div class="drop-zone" id="giftCardDropZone">
+                  <div class="file-icon">🎁</div>
+                  <div class="file-info">
+                    <span class="browse-link" onclick="document.getElementById('giftCardFileInput2').click()">Browse files</span> or drag & drop
+                  </div>
+                  <div class="file-info mt-1 text-xs text-slate-400">Supported: JPG, PNG, PDF (Max 5MB)</div>
+                  <div id="giftCardFileInfo" style="display: none;" class="mt-2">
+                    <span class="file-name" id="giftCardFileName2"></span>
+                    <span class="file-size" id="giftCardFileSize"></span>
+                    <span class="remove-file" onclick="removeGiftCardFile()">✕ Remove</span>
+                  </div>
+                </div>
+                <input type="file" name="gift_card_file" id="giftCardFileInput2" accept="image/*,.pdf" style="display: none;">
+              </div>
+
+              <!-- Payment Proof (for bank/crypto) -->
+              <div id="paymentProofField">
+                <label class="form-label">Payment Proof</label>
+                <div class="drop-zone" id="proofDropZone">
+                  <div class="file-icon">📎</div>
+                  <div class="file-info">
+                    <span class="browse-link" onclick="document.getElementById('proofFileInput').click()">Browse files</span> or drag & drop
+                  </div>
+                  <div class="file-info mt-1 text-xs text-slate-400">Supported: JPG, PNG, PDF (Max 5MB)</div>
+                  <div id="proofFileInfo" style="display: none;" class="mt-2">
+                    <span class="file-name" id="proofFileName"></span>
+                    <span class="file-size" id="proofFileSize"></span>
+                    <span class="remove-file" onclick="removeProofFile()">✕ Remove</span>
+                  </div>
+                </div>
+                <input type="file" name="proof" id="proofFileInput" accept="image/*,.pdf" style="display: none;">
+              </div>
+
+              <!-- Hidden fields for categorization -->
+              <input type="hidden" name="crypto_address" id="cryptoAddressInput">
+              <input type="hidden" name="deposit_type" id="depositTypeInput" value="deposit">
 
               <!-- Notes -->
               <div>
@@ -152,11 +260,10 @@
                 <textarea name="notes" rows="3" class="form-input" placeholder="Any additional information..."></textarea>
               </div>
 
-              <!-- Hidden method field (set by JS) -->
-              <input type="hidden" name="method" id="depositMethod" value="bank_transfer">
-
               <!-- Submit -->
-              <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">Submit Deposit</button>
+              <button type="submit" id="submitBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                Submit Deposit
+              </button>
             </div>
           </form>
         </div>
@@ -167,9 +274,204 @@
 
 <script>
   // ===== GIFT CARD UPLOAD =====
-  document.getElementById('giftCardUploadBtn').addEventListener('click', () => {
-    document.getElementById('giftCardFile').click();
+  const giftCardBtn = document.getElementById('giftCardUploadBtn');
+  const giftCardFileInput = document.getElementById('giftCardFileInput');
+  const giftCardFileName = document.getElementById('giftCardFileName');
+
+  if (giftCardBtn) {
+    giftCardBtn.addEventListener('click', () => {
+      giftCardFileInput.click();
+    });
+  }
+
+  if (giftCardFileInput) {
+    giftCardFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        giftCardFileName.textContent = e.target.files[0].name;
+      } else {
+        giftCardFileName.textContent = 'No file selected';
+      }
+    });
+  }
+
+  // ===== DEPOSIT METHOD TOGGLE =====
+  const methodSelect = document.getElementById('depositMethodSelect');
+  const giftCardCodeField = document.getElementById('giftCardCodeField');
+  const giftCardUploadField = document.getElementById('giftCardUploadField');
+  const paymentProofField = document.getElementById('paymentProofField');
+  const depositTypeInput = document.getElementById('depositTypeInput');
+
+  methodSelect.addEventListener('change', function() {
+    const method = this.value;
+    
+    // Hide all special fields
+    giftCardCodeField.style.display = 'none';
+    giftCardUploadField.style.display = 'none';
+    paymentProofField.style.display = 'block';
+    
+    // Show relevant fields based on method
+    if (method === 'gift_card') {
+      giftCardCodeField.style.display = 'block';
+      giftCardUploadField.style.display = 'block';
+      paymentProofField.style.display = 'none';
+      depositTypeInput.value = 'giftcard'; // Set type for admin categorization
+    } else {
+      depositTypeInput.value = 'deposit'; // Regular deposit
+    }
   });
+
+  // ===== DRAG & DROP FOR PROOF FILE =====
+  const proofDropZone = document.getElementById('proofDropZone');
+  const proofFileInput = document.getElementById('proofFileInput');
+  const proofFileInfo = document.getElementById('proofFileInfo');
+  const proofFileName = document.getElementById('proofFileName');
+  const proofFileSize = document.getElementById('proofFileSize');
+
+  // Click to browse
+  proofDropZone.addEventListener('click', (e) => {
+    if (e.target.closest('.remove-file')) return;
+    proofFileInput.click();
+  });
+
+  // Drag & drop events
+  proofDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    proofDropZone.classList.add('dragover');
+  });
+
+  proofDropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    proofDropZone.classList.remove('dragover');
+  });
+
+  proofDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    proofDropZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleProofFile(files[0]);
+    }
+  });
+
+  // File input change
+  proofFileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handleProofFile(e.target.files[0]);
+    }
+  });
+
+  function handleProofFile(file) {
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a JPG, PNG, or PDF file.');
+      proofFileInput.value = '';
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB.');
+      proofFileInput.value = '';
+      return;
+    }
+
+    proofDropZone.classList.add('has-file');
+    proofFileInfo.style.display = 'block';
+    proofFileName.textContent = file.name;
+    proofFileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+    
+    // Store file in input
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    proofFileInput.files = dt.files;
+  }
+
+  function removeProofFile() {
+    proofDropZone.classList.remove('has-file');
+    proofFileInfo.style.display = 'none';
+    proofFileInput.value = '';
+    proofFileName.textContent = '';
+    proofFileSize.textContent = '';
+  }
+
+  // ===== DRAG & DROP FOR GIFT CARD FILE =====
+  const giftCardDropZone = document.getElementById('giftCardDropZone');
+  const giftCardFileInput2 = document.getElementById('giftCardFileInput2');
+  const giftCardFileInfo = document.getElementById('giftCardFileInfo');
+  const giftCardFileName2 = document.getElementById('giftCardFileName2');
+  const giftCardFileSize2 = document.getElementById('giftCardFileSize');
+
+  // Click to browse
+  if (giftCardDropZone) {
+    giftCardDropZone.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-file')) return;
+      giftCardFileInput2.click();
+    });
+  }
+
+  // Drag & drop events
+  if (giftCardDropZone) {
+    giftCardDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      giftCardDropZone.classList.add('dragover');
+    });
+
+    giftCardDropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      giftCardDropZone.classList.remove('dragover');
+    });
+
+    giftCardDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      giftCardDropZone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleGiftCardFile(files[0]);
+      }
+    });
+  }
+
+  // File input change
+  if (giftCardFileInput2) {
+    giftCardFileInput2.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleGiftCardFile(e.target.files[0]);
+      }
+    });
+  }
+
+  function handleGiftCardFile(file) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a JPG, PNG, or PDF file.');
+      giftCardFileInput2.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB.');
+      giftCardFileInput2.value = '';
+      return;
+    }
+
+    giftCardDropZone.classList.add('has-file');
+    giftCardFileInfo.style.display = 'block';
+    giftCardFileName2.textContent = file.name;
+    giftCardFileSize2.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+    
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    giftCardFileInput2.files = dt.files;
+  }
+
+  function removeGiftCardFile() {
+    giftCardDropZone.classList.remove('has-file');
+    giftCardFileInfo.style.display = 'none';
+    giftCardFileInput2.value = '';
+    giftCardFileName2.textContent = '';
+    giftCardFileSize2.textContent = '';
+  }
 
   // ===== CRYPTO DATA & QR =====
   const cryptoData = {
@@ -195,7 +497,10 @@
     const data = cryptoData[coin];
     if (!data) return;
 
-    document.getElementById('walletAddress').value = data.address;
+    const addressInput = document.getElementById('walletAddress');
+    const cryptoAddressInput = document.getElementById('cryptoAddressInput');
+    addressInput.value = data.address;
+    cryptoAddressInput.value = data.address;
 
     document.querySelectorAll('.crypto-option').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.coin === coin);
@@ -211,13 +516,13 @@
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
-
-    document.getElementById('depositMethod').value = 'crypto_' + coin;
   }
 
   document.querySelectorAll('.crypto-option').forEach(btn => {
     btn.addEventListener('click', () => {
       updateCrypto(btn.dataset.coin);
+      methodSelect.value = 'crypto';
+      methodSelect.dispatchEvent(new Event('change'));
     });
   });
 
@@ -233,6 +538,14 @@
       alert('Address copied!');
     });
   }
+
+  // ===== FORM SUBMISSION WITH LOADING STATE =====
+  document.getElementById('depositForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+  });
 </script>
+
 </body>
 </html>
