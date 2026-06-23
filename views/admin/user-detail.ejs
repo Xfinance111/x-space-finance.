@@ -80,6 +80,22 @@
         </div>
       </div>
 
+      <!-- ====== REALIZED BALANCE (NEW) ====== -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-bold text-white">💎 Realized Balance</h2>
+            <p class="text-sm text-slate-400">Admin-adjusted realized returns</p>
+            <p class="text-2xl font-bold text-emerald-400 mt-1" id="realizedDisplay">
+              $<%= (targetUser.realized || 0).toFixed(2) %>
+            </p>
+          </div>
+          <button onclick="openRealizedModal()" class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
+            Adjust Realized
+          </button>
+        </div>
+      </div>
+
       <!-- Adjust Balance Form -->
       <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
         <h2 class="text-lg font-bold mb-4">💰 Adjust Balance</h2>
@@ -247,6 +263,30 @@
     </div>
   </div>
 
+  <!-- ====== REALIZED MODAL ====== -->
+  <div id="realizedModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+    <div class="bg-slate-800 rounded-xl max-w-md w-full p-6 border border-slate-700">
+      <h2 class="text-xl font-bold text-white mb-2">Adjust Realized Balance</h2>
+      <p class="text-sm text-slate-400 mb-4">Enter an amount to add or subtract from the user's realized balance.</p>
+      <form id="realizedForm">
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Amount (+ for credit, - for debit)</label>
+            <input type="number" step="0.01" id="realizedAmount" placeholder="e.g. 100 or -50" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white" required>
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Reason (optional)</label>
+            <input type="text" id="realizedReason" placeholder="e.g. Bonus, Correction" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white">
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition text-white font-semibold">Update Realized</button>
+            <button type="button" onclick="closeRealizedModal()" class="flex-1 px-4 py-2 bg-slate-600 rounded-lg hover:bg-slate-500 transition text-white font-semibold">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // Balance preview
     document.getElementById('amountDelta')?.addEventListener('input', function() {
@@ -265,6 +305,57 @@
         document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
       });
     });
+
+    // ===== Realized Modal =====
+    function openRealizedModal() {
+      document.getElementById('realizedModal').classList.remove('hidden');
+      document.getElementById('realizedModal').classList.add('flex');
+      document.getElementById('realizedAmount').value = '';
+      document.getElementById('realizedReason').value = '';
+    }
+    function closeRealizedModal() {
+      document.getElementById('realizedModal').classList.add('hidden');
+      document.getElementById('realizedModal').classList.remove('flex');
+    }
+
+    // ===== Submit Realized Update =====
+    document.getElementById('realizedForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amount = document.getElementById('realizedAmount').value;
+      const reason = document.getElementById('realizedReason').value || 'Admin adjusted realized';
+      const userId = <%= targetUser.id %>;
+      
+      if (!amount || isNaN(amount)) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/admin/user/${userId}/realized`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, reason })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('realizedDisplay').textContent = '$' + data.newRealized.toFixed(2);
+          closeRealizedModal();
+          // Refresh the page to reflect all changes
+          location.reload();
+        } else {
+          alert('Failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error updating realized balance.');
+      }
+    });
+
+    // ===== Close modal with Escape key =====
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeRealizedModal();
+      }
+    });
   </script>
 </body>
-</html>
