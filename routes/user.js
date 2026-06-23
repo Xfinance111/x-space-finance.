@@ -76,108 +76,118 @@ router.get('/', async (req, res) => {
     const userId = req.session.userId;
     if (!userId) return res.redirect('/signin');
 
-    const user = await db.get(
+    const user = await db.query(
       `SELECT id, first_name, last_name, email, balance, currency, 
               kyc_status, referral_code, email_verified, created_at, is_admin,
               COALESCE(realized, 0) as realized
-       FROM users WHERE id = ?`,
+       FROM users WHERE id = $1`,
       [userId]
     );
-    if (!user) {
+    
+    if (!user || !user.rows || user.rows.length === 0) {
       req.session.destroy();
       return res.redirect('/signin');
     }
+    
+    const userData = user.rows[0];
 
     // --- Active investments ---
-    const activeInvestments = await db.all(`
+    const activeInvestments = await db.query(`
       SELECT i.*, p.name as plan_name, p.roi_percent, p.duration_months
       FROM investments i 
       JOIN plans p ON i.plan_id = p.id
-      WHERE i.user_id = ? AND i.status = 'active'
+      WHERE i.user_id = $1 AND i.status = 'active'
       ORDER BY i.created_at DESC
     `, [userId]);
 
     // --- All investments (for total invested) ---
-    const allInvestments = await db.all(`
-      SELECT amount, status FROM investments WHERE user_id = ?
+    const allInvestments = await db.query(`
+      SELECT amount, status FROM investments WHERE user_id = $1
     `, [userId]);
 
     // --- Matured investments (for realized returns) ---
-    const maturedInvestments = await db.all(`
+    const maturedInvestments = await db.query(`
       SELECT amount, total_return FROM investments 
-      WHERE user_id = ? AND status = 'matured'
+      WHERE user_id = $1 AND status = 'matured'
     `, [userId]);
 
     // --- Compute stats with safe defaults ---
     let totalInvested = 0;
     let activeCount = 0;
     let totalExpectedReturn = 0;
-    let availableBalance = parseFloat(user.balance) || 0;
+    let availableBalance = parseFloat(userData.balance) || 0;
     let portfolioValue = availableBalance;
 
-    allInvestments.forEach(inv => {
-      if (inv.status === 'active') {
-        totalInvested += parseFloat(inv.amount) || 0;
-        activeCount++;
-      }
-    });
+    if (allInvestments && allInvestments.rows) {
+      allInvestments.rows.forEach(inv => {
+        if (inv.status === 'active') {
+          totalInvested += parseFloat(inv.amount) || 0;
+          activeCount++;
+        }
+      });
+    }
 
-    activeInvestments.forEach(inv => {
-      const roi = parseFloat(inv.roi_percent) / 100 || 0;
-      const expected = parseFloat(inv.amount) * (1 + roi);
-      totalExpectedReturn += expected;
-    });
+    if (activeInvestments && activeInvestments.rows) {
+      activeInvestments.rows.forEach(inv => {
+        const roi = parseFloat(inv.roi_percent) / 100 || 0;
+        const expected = parseFloat(inv.amount) * (1 + roi);
+        totalExpectedReturn += expected;
+      });
+    }
 
     // Realized returns = admin-adjusted realized + matured returns
-    const maturedReturn = maturedInvestments.reduce((sum, inv) => sum + parseFloat(inv.total_return || 0), 0);
-    const realizedReturn = parseFloat(user.realized || 0) + maturedReturn;
+    let maturedReturn = 0;
+    if (maturedInvestments && maturedInvestments.rows) {
+      maturedReturn = maturedInvestments.rows.reduce((sum, inv) => sum + parseFloat(inv.total_return || 0), 0);
+    }
+    const realizedReturn = parseFloat(userData.realized || 0) + maturedReturn;
 
     portfolioValue = availableBalance + totalInvested;
 
     // --- Checklist flags ---
-    const hasDeposit = await db.get(`SELECT COUNT(*) as count FROM deposits WHERE user_id = ? AND status = 'approved'`, [userId]);
-    const hasInvestment = await db.get('SELECT COUNT(*) as count FROM investments WHERE user_id = ?', [userId]);
-    const isEmailVerified = !!user.email_verified;
-    const isKycVerified = user.kyc_status === 'approved';
+    const hasDeposit = await db.query(`SELECT COUNT(*) as count FROM deposits WHERE user_id = $1 AND status = 'approved'`, [userId]);
+    const hasInvestment = await db.query('SELECT COUNT(*) as count FROM investments WHERE user_id = $1', [userId]);
+    const isEmailVerified = !!userData.email_verified;
+    const isKycVerified = userData.kyc_status === 'approved';
 
     // --- Recent transactions (limit 5) ---
-    const recentTransactions = await db.all(`
+    const recentTransactions = await db.query(`
       SELECT * FROM transactions 
-      WHERE user_id = ? 
+      WHERE user_id = $1 
       ORDER BY created_at DESC 
       LIMIT 5
     `, [userId]);
 
     // --- Referral earnings ---
-    const referralEarnings = await db.get(`
+    const referralEarnings = await db.query(`
       SELECT COALESCE(SUM(amount),0) as total FROM transactions 
-      WHERE user_id = ? AND type = 'referral'
+      WHERE user_id = $1 AND type = 'referral'
     `, [userId]);
 
     // --- Pending counts (for sidebar badges) ---
-    const pendingDeposits = await db.get(`SELECT COUNT(*) as count FROM deposits WHERE user_id = ? AND status = 'pending'`, [userId]);
-    const pendingWithdrawals = await db.get(`SELECT COUNT(*) as count FROM withdrawals WHERE user_id = ? AND status = 'pending'`, [userId]);
-    const unreadCount = await db.get('SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0', [userId]);
+    const pendingDeposits = await db.query(`SELECT COUNT(*) as count FROM deposits WHERE user_id = $1 AND status = 'pending'`, [userId]);
+    const pendingWithdrawals = await db.query(`SELECT COUNT(*) as count FROM withdrawals WHERE user_id = $1 AND status = 'pending'`, [userId]);
+    const unreadCount = await db.query('SELECT COUNT(*) as count FROM notifications WHERE user_id = $1 AND is_read = 0', [userId]);
 
     res.render('dashboard/index', {
       title: 'Dashboard',
-      user,
-      activeInvestments: activeInvestments || [],
+      user: userData,
+      activeInvestments: activeInvestments?.rows || [],
       totalInvested,
       activeCount,
       totalExpectedReturn,
       realizedReturn,
       availableBalance,
       portfolioValue,
-      recentTransactions: recentTransactions || [],
-      referralEarnings: referralEarnings?.total || 0,
+      recentTransactions: recentTransactions?.rows || [],
+      referralEarnings: referralEarnings?.rows[0]?.total || 0,
       isEmailVerified,
       isKycVerified,
-      hasDeposit: hasDeposit?.count > 0,
-      hasInvestment: hasInvestment?.count > 0,
-      pendingDeposits: pendingDeposits?.count || 0,
-      pendingWithdrawals: pendingWithdrawals?.count || 0,
-      unreadCount: unreadCount?.count || 0
+      hasDeposit: hasDeposit?.rows[0]?.count > 0,
+      hasInvestment: hasInvestment?.rows[0]?.count > 0,
+      pendingDeposits: pendingDeposits?.rows[0]?.count || 0,
+      pendingWithdrawals: pendingWithdrawals?.rows[0]?.count || 0,
+      unreadCount: unreadCount?.rows[0]?.count || 0
     });
   } catch (error) {
     console.error('Dashboard error:', error);
@@ -189,29 +199,33 @@ router.get('/', async (req, res) => {
 router.get('/investments', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const investments = await db.all(`
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const userData = user?.rows[0] || null;
+    
+    const investments = await db.query(`
       SELECT i.*, p.name as plan_name, p.roi_percent, p.duration_months
       FROM investments i JOIN plans p ON i.plan_id = p.id
-      WHERE i.user_id = ?
+      WHERE i.user_id = $1
       ORDER BY i.created_at DESC
     `, [userId]);
 
     let totalInvested = 0, activeCount = 0, totalExpectedReturn = 0, totalProfit = 0;
-    investments.forEach(inv => {
-      if (inv.status === 'active') {
-        totalInvested += parseFloat(inv.amount);
-        activeCount++;
-        const expected = parseFloat(inv.amount) * (1 + parseFloat(inv.roi_percent) / 100);
-        totalExpectedReturn += expected;
-        totalProfit += (expected - parseFloat(inv.amount));
-      }
-    });
+    if (investments && investments.rows) {
+      investments.rows.forEach(inv => {
+        if (inv.status === 'active') {
+          totalInvested += parseFloat(inv.amount);
+          activeCount++;
+          const expected = parseFloat(inv.amount) * (1 + parseFloat(inv.roi_percent) / 100);
+          totalExpectedReturn += expected;
+          totalProfit += (expected - parseFloat(inv.amount));
+        }
+      });
+    }
 
     res.render('dashboard/investments', {
       title: 'My Investments',
-      user,
-      investments,
+      user: userData,
+      investments: investments?.rows || [],
       totalInvested,
       activeCount,
       totalExpectedReturn,
@@ -227,9 +241,13 @@ router.get('/investments', async (req, res) => {
 router.get('/new-investment', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const plans = await db.all('SELECT * FROM plans WHERE is_active = 1 ORDER BY min_amount ASC');
-    res.render('dashboard/new-investment', { title: 'New Investment', user, plans: plans || [] });
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const plans = await db.query('SELECT * FROM plans WHERE is_active = 1 ORDER BY min_amount ASC');
+    res.render('dashboard/new-investment', { 
+      title: 'New Investment', 
+      user: user?.rows[0] || null, 
+      plans: plans?.rows || [] 
+    });
   } catch (error) {
     console.error('New investment error:', error);
     res.status(500).send('Error loading new investment page');
@@ -245,38 +263,46 @@ router.post('/new-investment', async (req, res) => {
       req.flash('error', 'Invalid investment details');
       return res.redirect('/dashboard/new-investment');
     }
-    const user = await db.get('SELECT id, balance FROM users WHERE id = ?', [userId]);
-    if (!user) { req.flash('error', 'User not found'); return res.redirect('/dashboard/new-investment'); }
-    const plan = await db.get('SELECT * FROM plans WHERE id = ? AND is_active = 1', [plan_id]);
-    if (!plan) { req.flash('error', 'Plan not found'); return res.redirect('/dashboard/new-investment'); }
+    const user = await db.query('SELECT id, balance FROM users WHERE id = $1', [userId]);
+    if (!user || !user.rows || user.rows.length === 0) { 
+      req.flash('error', 'User not found'); 
+      return res.redirect('/dashboard/new-investment'); 
+    }
+    const plan = await db.query('SELECT * FROM plans WHERE id = $1 AND is_active = 1', [plan_id]);
+    if (!plan || !plan.rows || plan.rows.length === 0) { 
+      req.flash('error', 'Plan not found'); 
+      return res.redirect('/dashboard/new-investment'); 
+    }
 
+    const userData = user.rows[0];
+    const planData = plan.rows[0];
     const amt = parseFloat(amount);
-    const min = parseFloat(plan.min_amount);
-    const max = parseFloat(plan.max_amount);
+    const min = parseFloat(planData.min_amount);
+    const max = parseFloat(planData.max_amount);
 
     if (amt < min) { req.flash('error', `Minimum investment is $${min.toLocaleString()}`); return res.redirect('/dashboard/new-investment'); }
     if (amt > max) { req.flash('error', `Maximum investment is $${max.toLocaleString()}`); return res.redirect('/dashboard/new-investment'); }
-    if (amt > parseFloat(user.balance)) { req.flash('error', 'Insufficient balance'); return res.redirect('/dashboard/new-investment'); }
+    if (amt > parseFloat(userData.balance)) { req.flash('error', 'Insufficient balance'); return res.redirect('/dashboard/new-investment'); }
 
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + plan.duration_months * 30);
+    endDate.setDate(endDate.getDate() + planData.duration_months * 30);
 
-    await db.run(
+    await db.query(
       `INSERT INTO investments (user_id, plan_id, amount, status, created_at, start_date, end_date)
-       VALUES (?, ?, ?, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)`,
+       VALUES ($1, $2, $3, 'active', NOW(), NOW(), $4)`,
       [userId, plan_id, amount, endDate.toISOString()]
     );
 
-    await db.run('UPDATE users SET balance = balance - ? WHERE id = ?', [amount, userId]);
-    await db.run(`INSERT INTO transactions (user_id, type, amount, status, description, created_at)
-                  VALUES (?, 'investment', ?, 'completed', ?, CURRENT_TIMESTAMP)`,
-                  [userId, amount, `Investment in ${plan.name}`]);
-    await db.run(`INSERT INTO notifications (user_id, title, message, is_read, created_at)
-                  VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`,
-                  [userId, 'Investment Activated', `Your investment of $${amount} in ${plan.name} has been activated.`]);
-    await db.run(`INSERT INTO activity_log (user_id, action, type, description, created_at)
-                  VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-                  [userId, 'investment', 'investment', `Invested $${amount} in ${plan.name}`]);
+    await db.query('UPDATE users SET balance = balance - $1 WHERE id = $2', [amount, userId]);
+    await db.query(`INSERT INTO transactions (user_id, type, amount, status, description, created_at)
+                    VALUES ($1, 'investment', $2, 'completed', $3, NOW())`,
+                    [userId, amount, `Investment in ${planData.name}`]);
+    await db.query(`INSERT INTO notifications (user_id, title, message, is_read, created_at)
+                    VALUES ($1, $2, $3, 0, NOW())`,
+                    [userId, 'Investment Activated', `Your investment of $${amount} in ${planData.name} has been activated.`]);
+    await db.query(`INSERT INTO activity_log (user_id, action, type, description, created_at)
+                    VALUES ($1, $2, $3, $4, NOW())`,
+                    [userId, 'investment', 'investment', `Invested $${amount} in ${planData.name}`]);
     req.flash('success', 'Investment created successfully!');
     res.redirect('/dashboard/investments');
   } catch (error) {
@@ -290,14 +316,18 @@ router.post('/new-investment', async (req, res) => {
 router.get('/active-plans', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const activePlans = await db.all(`
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const activePlans = await db.query(`
       SELECT i.*, p.name as plan_name, p.roi_percent, p.duration_months
       FROM investments i JOIN plans p ON i.plan_id = p.id
-      WHERE i.user_id = ? AND i.status = 'active'
+      WHERE i.user_id = $1 AND i.status = 'active'
       ORDER BY i.end_date ASC
     `, [userId]);
-    res.render('dashboard/active-plans', { title: 'Active Plans', user, activePlans: activePlans || [] });
+    res.render('dashboard/active-plans', { 
+      title: 'Active Plans', 
+      user: user?.rows[0] || null, 
+      activePlans: activePlans?.rows || [] 
+    });
   } catch (error) {
     console.error('Active plans error:', error);
     res.render('dashboard/active-plans', { title: 'Active Plans', user: null, activePlans: [] });
@@ -308,17 +338,22 @@ router.get('/active-plans', async (req, res) => {
 router.get('/deposits', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const deposits = await db.all('SELECT * FROM deposits WHERE user_id = ? ORDER BY created_at DESC', [userId]);
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const deposits = await db.query('SELECT * FROM deposits WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
     const walletAddresses = { BTC: 'bc1qtpfcvuvt2nm6dastam8rnmt1m8v7tun9aacjup', ETH: '0xf9d5388984dBE9B79c717436e1f548fD58438692', SOL: 'CVfsT2QwoJRNLrLkAvvmBEshDS2L4CrcfduYZAa5NaW6' };
-    res.render('dashboard/deposits', { title: 'Deposits', user, deposits: deposits || [], walletAddresses });
+    res.render('dashboard/deposits', { 
+      title: 'Deposits', 
+      user: user?.rows[0] || null, 
+      deposits: deposits?.rows || [], 
+      walletAddresses 
+    });
   } catch (error) {
     console.error('Deposits error:', error);
     res.render('dashboard/deposits', { title: 'Deposits', user: null, deposits: [], walletAddresses: {} });
   }
 });
 
-// ==================== DEPOSITS (POST) - UPDATED ====================
+// ==================== DEPOSITS (POST) - FULLY WORKING ====================
 router.post('/deposits', 
   depositUpload.fields([
     { name: 'proof', maxCount: 1 },
@@ -329,7 +364,7 @@ router.post('/deposits',
       const userId = req.session.userId;
       const { amount, method, notes, gift_card_code, crypto_address, deposit_type } = req.body;
       
-      // Check if files were uploaded
+      console.log('=== DEPOSIT SUBMISSION ===');
       console.log('Files received:', req.files);
       console.log('Body received:', req.body);
 
@@ -339,7 +374,6 @@ router.post('/deposits',
         return res.redirect('/dashboard/deposits');
       }
 
-      // Prepare file paths
       let proofFile = null;
       let giftCardFile = null;
       
@@ -352,36 +386,38 @@ router.post('/deposits',
         }
       }
 
-      // Insert deposit with all fields
-      await db.run(
+      const isGiftCard = method === 'gift_card' || deposit_type === 'giftcard';
+
+      // Insert with all columns - PostgreSQL syntax
+      await db.query(
         `INSERT INTO deposits 
          (user_id, amount, method, proof_path, gift_card_code, gift_card_file, 
           deposit_type, notes, status, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', NOW())`,
         [
           userId, 
           amt, 
           method || 'bank_transfer', 
-          proofFile, 
-          gift_card_code || null,
+          proofFile || giftCardFile,
+          isGiftCard ? gift_card_code : null,
           giftCardFile,
-          deposit_type || 'deposit',
+          isGiftCard ? 'giftcard' : 'deposit',
           notes || ''
         ]
       );
 
       // Create notification
-      await db.run(
+      await db.query(
         `INSERT INTO notifications (user_id, title, message, is_read, created_at)
-         VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`,
-        [userId, 'Deposit Requested', `Your deposit of $${amt} is pending confirmation.`]
+         VALUES ($1, $2, $3, $4, NOW())`,
+        [userId, 'Deposit Requested', `Your ${isGiftCard ? 'gift card' : 'deposit'} of $${amt} is pending confirmation.`, 0]
       );
 
       // Log activity
-      await db.run(
+      await db.query(
         `INSERT INTO activity_log (user_id, action, type, description, created_at)
-         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-        [userId, 'deposit_request', 'deposit', `Requested deposit of $${amt} via ${method || 'bank_transfer'}`]
+         VALUES ($1, $2, $3, $4, NOW())`,
+        [userId, 'deposit_request', 'deposit', `Requested ${isGiftCard ? 'gift card' : 'deposit'} of $${amt}`]
       );
 
       req.flash('success', 'Deposit request submitted successfully!');
@@ -394,9 +430,11 @@ router.post('/deposits',
       if (req.files) {
         Object.keys(req.files).forEach(key => {
           req.files[key].forEach(file => {
-            fs.unlink(file.path, (err) => {
-              if (err) console.error('Error deleting file:', err);
-            });
+            try {
+              fs.unlinkSync(file.path);
+            } catch (e) {
+              console.error('Error deleting file:', e);
+            }
           });
         });
       }
@@ -437,9 +475,13 @@ router.use((err, req, res, next) => {
 router.get('/withdrawals', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const withdrawals = await db.all('SELECT * FROM withdrawals WHERE user_id = ? ORDER BY created_at DESC', [userId]);
-    res.render('dashboard/withdrawals', { title: 'Withdrawals', user, withdrawals: withdrawals || [] });
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const withdrawals = await db.query('SELECT * FROM withdrawals WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
+    res.render('dashboard/withdrawals', { 
+      title: 'Withdrawals', 
+      user: user?.rows[0] || null, 
+      withdrawals: withdrawals?.rows || [] 
+    });
   } catch (error) {
     console.error('Withdrawals error:', error);
     res.status(500).send('Error loading withdrawals');
@@ -453,18 +495,26 @@ router.post('/withdrawals', async (req, res) => {
     if (!amount || amount <= 0) { req.flash('error', 'Invalid amount'); return res.redirect('/dashboard/withdrawals'); }
     if (!address) { req.flash('error', 'Wallet address required'); return res.redirect('/dashboard/withdrawals'); }
 
-    const user = await db.get('SELECT balance FROM users WHERE id = ?', [userId]);
-    if (parseFloat(user.balance) < parseFloat(amount)) { req.flash('error', 'Insufficient balance'); return res.redirect('/dashboard/withdrawals'); }
+    const user = await db.query('SELECT balance FROM users WHERE id = $1', [userId]);
+    if (!user || !user.rows || user.rows.length === 0) {
+      req.flash('error', 'User not found');
+      return res.redirect('/dashboard/withdrawals');
+    }
+    
+    if (parseFloat(user.rows[0].balance) < parseFloat(amount)) { 
+      req.flash('error', 'Insufficient balance'); 
+      return res.redirect('/dashboard/withdrawals'); 
+    }
 
-    await db.run(`INSERT INTO withdrawals (user_id, amount, method, address, status, created_at)
-                  VALUES (?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP)`,
-                  [userId, amount, method, address]);
-    await db.run(`INSERT INTO notifications (user_id, title, message, is_read, created_at)
-                  VALUES (?, ?, ?, 0, CURRENT_TIMESTAMP)`,
-                  [userId, 'Withdrawal Request', `Your withdrawal request of $${amount} is pending approval.`]);
-    await db.run(`INSERT INTO activity_log (user_id, action, type, description, created_at)
-                  VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-                  [userId, 'withdrawal_request', 'withdrawal', `Requested withdrawal of $${amount} via ${method}`]);
+    await db.query(`INSERT INTO withdrawals (user_id, amount, method, address, status, created_at)
+                    VALUES ($1, $2, $3, $4, 'pending', NOW())`,
+                    [userId, amount, method, address]);
+    await db.query(`INSERT INTO notifications (user_id, title, message, is_read, created_at)
+                    VALUES ($1, $2, $3, $4, NOW())`,
+                    [userId, 'Withdrawal Request', `Your withdrawal request of $${amount} is pending approval.`, 0]);
+    await db.query(`INSERT INTO activity_log (user_id, action, type, description, created_at)
+                    VALUES ($1, $2, $3, $4, NOW())`,
+                    [userId, 'withdrawal_request', 'withdrawal', `Requested withdrawal of $${amount} via ${method}`]);
     req.flash('success', 'Withdrawal request submitted successfully!');
     res.redirect('/dashboard/withdrawals');
   } catch (error) {
@@ -478,9 +528,13 @@ router.post('/withdrawals', async (req, res) => {
 router.get('/transactions', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const transactions = await db.all('SELECT * FROM transactions WHERE user_id = ? ORDER BY created_at DESC', [userId]);
-    res.render('dashboard/transactions', { title: 'Transactions', user, transactions: transactions || [] });
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const transactions = await db.query('SELECT * FROM transactions WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
+    res.render('dashboard/transactions', { 
+      title: 'Transactions', 
+      user: user?.rows[0] || null, 
+      transactions: transactions?.rows || [] 
+    });
   } catch (error) {
     console.error('Transactions error:', error);
     res.status(500).send('Error loading transactions');
@@ -491,11 +545,11 @@ router.get('/transactions', async (req, res) => {
 router.get('/profile', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get(
-      'SELECT id, first_name, last_name, email, balance, currency, created_at, phone, dob, address, address2, city, state, postal_code, country, kyc_status, referral_code FROM users WHERE id = ?',
+    const user = await db.query(
+      'SELECT id, first_name, last_name, email, balance, currency, created_at, phone, dob, address, address2, city, state, postal_code, country, kyc_status, referral_code FROM users WHERE id = $1',
       [userId]
     );
-    res.render('dashboard/profile', { title: 'Profile', user });
+    res.render('dashboard/profile', { title: 'Profile', user: user?.rows[0] || null });
   } catch (error) {
     console.error('Profile error:', error);
     res.status(500).send('Error loading profile');
@@ -508,12 +562,12 @@ router.post('/profile/update', async (req, res) => {
     const userId = req.session.userId;
     const { first_name, last_name, phone, dob, address, address2, city, state, postal_code, country } = req.body;
 
-    await db.run(`
+    await db.query(`
       UPDATE users SET
-        first_name = ?, last_name = ?, phone = ?, dob = ?,
-        address = ?, address2 = ?, city = ?, state = ?,
-        postal_code = ?, country = ?
-      WHERE id = ?
+        first_name = $1, last_name = $2, phone = $3, dob = $4,
+        address = $5, address2 = $6, city = $7, state = $8,
+        postal_code = $9, country = $10
+      WHERE id = $11
     `, [first_name, last_name, phone, dob, address, address2, city, state, postal_code, country, userId]);
 
     req.flash('success', 'Profile updated successfully');
@@ -540,25 +594,25 @@ router.post('/change-password', async (req, res) => {
       return res.redirect('/dashboard/profile');
     }
 
-    const user = await db.get('SELECT password FROM users WHERE id = ?', [userId]);
-    if (!user) {
+    const user = await db.query('SELECT password FROM users WHERE id = $1', [userId]);
+    if (!user || !user.rows || user.rows.length === 0) {
       req.flash('error', 'User not found');
       return res.redirect('/dashboard/profile');
     }
 
-    const valid = await bcrypt.compare(current_password, user.password);
+    const valid = await bcrypt.compare(current_password, user.rows[0].password);
     if (!valid) {
       req.flash('error', 'Current password is incorrect');
       return res.redirect('/dashboard/profile');
     }
 
     const hashed = await bcrypt.hash(new_password, 10);
-    await db.run('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
+    await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, userId]);
 
     try {
-      await db.run(`
+      await db.query(`
         INSERT INTO activity_log (user_id, action, type, description, created_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        VALUES ($1, $2, $3, $4, NOW())
       `, [userId, 'password_change', 'security', 'Changed password']);
     } catch (e) {}
 
@@ -577,15 +631,15 @@ router.get('/notifications', async (req, res) => {
     const userId = req.session.userId;
     if (!userId) return res.redirect('/signin');
     
-    const user = await db.get('SELECT id, first_name, last_name, email FROM users WHERE id = ?', [userId]);
-    const notifications = await db.all(
-      'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC',
+    const user = await db.query('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
+    const notifications = await db.query(
+      'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
     res.render('dashboard/notifications', {
       title: 'Notifications',
-      user,
-      notifications: notifications || []
+      user: user?.rows[0] || null,
+      notifications: notifications?.rows || []
     });
   } catch (error) {
     console.error('Notifications error:', error);
@@ -601,14 +655,13 @@ router.post('/notifications/mark-all-read', async (req, res) => {
       return res.status(401).json({ error: 'Not authenticated' });
     }
     
-    const result = await db.run(
-      'UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0',
+    await db.query(
+      'UPDATE notifications SET is_read = 1 WHERE user_id = $1 AND is_read = 0',
       [userId]
     );
     
     res.json({
       success: true,
-      updated: result.changes || 0,
       message: 'All notifications marked as read'
     });
   } catch (error) {
@@ -631,22 +684,22 @@ router.get('/notifications/load', async (req, res) => {
     const limit = 20;
     const offset = (page - 1) * limit;
     
-    const notifications = await db.all(
-      'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+    const notifications = await db.query(
+      'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
       [userId, limit, offset]
     );
     
-    const total = await db.get(
-      'SELECT COUNT(*) as count FROM notifications WHERE user_id = ?',
+    const total = await db.query(
+      'SELECT COUNT(*) as count FROM notifications WHERE user_id = $1',
       [userId]
     );
     
     res.json({
-      notifications: notifications || [],
-      total: total?.count || 0,
+      notifications: notifications?.rows || [],
+      total: total?.rows[0]?.count || 0,
       page,
       limit,
-      hasMore: (offset + notifications.length) < (total?.count || 0)
+      hasMore: (offset + (notifications?.rows?.length || 0)) < (total?.rows[0]?.count || 0)
     });
   } catch (error) {
     console.error('Load notifications error:', error);
@@ -658,9 +711,13 @@ router.get('/notifications/load', async (req, res) => {
 router.get('/activity-log', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email FROM users WHERE id = ?', [userId]);
-    const activities = await db.all('SELECT * FROM activity_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]);
-    res.render('dashboard/activity-log', { title: 'Activity Log', user, activities: activities || [] });
+    const user = await db.query('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
+    const activities = await db.query('SELECT * FROM activity_log WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50', [userId]);
+    res.render('dashboard/activity-log', { 
+      title: 'Activity Log', 
+      user: user?.rows[0] || null, 
+      activities: activities?.rows || [] 
+    });
   } catch (error) {
     console.error('Activity log error:', error);
     res.status(500).send('Error loading activity log');
@@ -671,8 +728,8 @@ router.get('/activity-log', async (req, res) => {
 router.get('/kyc', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, kyc_status FROM users WHERE id = ?', [userId]);
-    res.render('dashboard/kyc', { title: 'KYC Verification', user });
+    const user = await db.query('SELECT id, first_name, last_name, email, kyc_status FROM users WHERE id = $1', [userId]);
+    res.render('dashboard/kyc', { title: 'KYC Verification', user: user?.rows[0] || null });
   } catch (error) {
     console.error('KYC error:', error);
     res.render('dashboard/kyc', { title: 'KYC Verification', user: null });
@@ -687,7 +744,7 @@ router.post('/kyc/submit', upload.single('front_document'), async (req, res) => 
       req.flash('error', 'Please upload a document');
       return res.redirect('/dashboard/kyc');
     }
-    await db.run('UPDATE users SET kyc_status = \'pending\', kyc_doc = ? WHERE id = ?', [req.file.filename, userId]);
+    await db.query('UPDATE users SET kyc_status = $1, kyc_doc = $2 WHERE id = $3', ['pending', req.file.filename, userId]);
     req.flash('success', 'KYC submitted for review');
     res.redirect('/dashboard/kyc');
   } catch (error) {
@@ -701,9 +758,13 @@ router.post('/kyc/submit', upload.single('front_document'), async (req, res) => 
 router.get('/calculator', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = ?', [userId]);
-    const plans = await db.all('SELECT * FROM plans WHERE is_active = 1 ORDER BY min_amount ASC');
-    res.render('dashboard/calculator', { title: 'Investment Calculator', user, plans: plans || [] });
+    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
+    const plans = await db.query('SELECT * FROM plans WHERE is_active = 1 ORDER BY min_amount ASC');
+    res.render('dashboard/calculator', { 
+      title: 'Investment Calculator', 
+      user: user?.rows[0] || null, 
+      plans: plans?.rows || [] 
+    });
   } catch (error) {
     console.error('Calculator error:', error);
     res.render('dashboard/calculator', { title: 'Investment Calculator', user: null, plans: [] });
@@ -715,8 +776,8 @@ router.put('/api/user/profile', async (req, res) => {
   try {
     const userId = req.session.userId;
     const { first_name, last_name } = req.body;
-    await db.run('UPDATE users SET first_name = ?, last_name = ? WHERE id = ?', [first_name, last_name, userId]);
-    await db.run('INSERT INTO activity_log (user_id, action, type, description, created_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)', [userId, 'profile_update', 'profile', 'Updated profile information']);
+    await db.query('UPDATE users SET first_name = $1, last_name = $2 WHERE id = $3', [first_name, last_name, userId]);
+    await db.query('INSERT INTO activity_log (user_id, action, type, description, created_at) VALUES ($1, $2, $3, $4, NOW())', [userId, 'profile_update', 'profile', 'Updated profile information']);
     res.json({ success: true });
   } catch (error) {
     console.error('Profile update error:', error);
@@ -728,13 +789,13 @@ router.post('/api/user/change-password', async (req, res) => {
   try {
     const userId = req.session.userId;
     const { current_password, new_password } = req.body;
-    const user = await db.get('SELECT password FROM users WHERE id = ?', [userId]);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    const validPassword = await bcrypt.compare(current_password, user.password);
+    const user = await db.query('SELECT password FROM users WHERE id = $1', [userId]);
+    if (!user || !user.rows || user.rows.length === 0) return res.status(404).json({ message: 'User not found' });
+    const validPassword = await bcrypt.compare(current_password, user.rows[0].password);
     if (!validPassword) return res.status(400).json({ message: 'Current password is incorrect' });
     const hashedPassword = await bcrypt.hash(new_password, 10);
-    await db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
-    await db.run('INSERT INTO activity_log (user_id, action, type, description, created_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)', [userId, 'password_change', 'security', 'Changed password']);
+    await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+    await db.query('INSERT INTO activity_log (user_id, action, type, description, created_at) VALUES ($1, $2, $3, $4, NOW())', [userId, 'password_change', 'security', 'Changed password']);
     res.json({ success: true, message: 'Password changed successfully' });
   } catch (error) {
     console.error('Password change error:', error);
@@ -746,7 +807,7 @@ router.post('/notifications/:id/read', async (req, res) => {
   try {
     const notificationId = req.params.id;
     const userId = req.session.userId;
-    await db.run('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?', [notificationId, userId]);
+    await db.query('UPDATE notifications SET is_read = 1 WHERE id = $1 AND user_id = $2', [notificationId, userId]);
     res.json({ success: true });
   } catch (error) {
     console.error('Mark read error:', error);
