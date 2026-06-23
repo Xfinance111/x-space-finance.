@@ -174,6 +174,34 @@ router.post('/user/:id/balance', async (req, res) => {
   }
 });
 
+// ==================== UPDATE REALIZED BALANCE ====================
+router.post('/user/:id/realized', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { amount, reason } = req.body;
+    const delta = parseFloat(amount);
+    
+    if (isNaN(delta)) {
+      return res.status(400).json({ success: false, error: 'Invalid amount' });
+    }
+    
+    const user = await db.get('SELECT realized FROM users WHERE id = ?', [userId]);
+    const currentRealized = parseFloat(user.realized) || 0;
+    const newRealized = currentRealized + delta;
+    
+    await db.run('UPDATE users SET realized = ? WHERE id = ?', [newRealized, userId]);
+    await db.run(`
+      INSERT INTO transactions (user_id, type, amount, description, created_at)
+      VALUES (?, 'realized', ?, ?, datetime('now'))
+    `, [userId, delta, reason || 'Admin adjusted realized']);
+    
+    res.json({ success: true, newRealized });
+  } catch (error) {
+    console.error('Update realized error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Toggle User Ban
 router.post('/user/:id/toggle-ban', async (req, res) => {
   try {
