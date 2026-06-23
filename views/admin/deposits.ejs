@@ -1,13 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Deposits - XSpaceFinance</title><script src="https://cdn.tailwindcss.com"></script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Deposits - XSpaceFinance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .badge-giftcard { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+    .badge-deposit { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .badge-approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    .badge-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+    .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+  </style>
+</head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
   <%- include('../partials/admin-sidebar') %>
+  
   <div class="lg:ml-72 min-h-screen">
-    <div class="bg-slate-800/50 border-b border-slate-700 px-6 py-4"><h1 class="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">Manage Deposits</h1><p class="text-slate-400 text-sm">Review and process user deposit requests</p></div>
+    <!-- Header -->
+    <div class="bg-slate-800/50 border-b border-slate-700 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">Manage Deposits</h1>
+          <p class="text-slate-400 text-sm">Review and process user deposit requests including gift cards</p>
+        </div>
+        <div class="flex gap-2">
+          <a href="/admin/deposits?status=pending" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition">Pending</a>
+          <a href="/admin/deposits?status=approved" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition">Approved</a>
+          <a href="/admin/deposits?status=rejected" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition">Rejected</a>
+          <a href="/admin/deposits?status=all" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition">All</a>
+        </div>
+      </div>
+    </div>
+
     <div class="p-6">
-      <div class="flex gap-2 mb-4"><a href="/admin/deposits?status=pending" class="px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-400">Pending</a><a href="/admin/deposits?status=approved" class="px-4 py-2 rounded-lg bg-green-500/20 text-green-400">Approved</a><a href="/admin/deposits?status=rejected" class="px-4 py-2 rounded-lg bg-red-500/20 text-red-400">Rejected</a><a href="/admin/deposits?status=all" class="px-4 py-2 rounded-lg bg-slate-700 text-slate-300">All</a></div>
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"><div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700/50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">User</th><th class="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase">Amount</th><th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Method</th><th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">TX Hash</th><th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Status</th><th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Date</th><th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Actions</th></tr></thead><tbody><% deposits.forEach(function(d) { %><tr class="border-t border-slate-700 hover:bg-slate-700/30 transition"><td class="px-6 py-4"><%= d.first_name %> <%= d.last_name %><br><span class="text-xs text-slate-400"><%= d.email %></span></td><td class="px-6 py-4 text-right font-mono"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.amount) %></td><td class="px-6 py-4"><%= d.method || 'Crypto' %></td><td class="px-6 py-4 font-mono text-xs"><%= d.tx_hash || '—' %></td><td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded text-xs <%= d.status === 'approved' ? 'bg-green-500/20 text-green-400' : d.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400' %>"><%= d.status %></span></td><td class="px-6 py-4 text-center text-sm"><%= new Date(d.created_at).toLocaleDateString() %></td><td class="px-6 py-4 text-center"><% if(d.status === 'pending') { %><form method="POST" action="/admin/deposit/<%= d.id %>/approve" class="inline"><button class="px-3 py-1 bg-green-600 rounded-lg text-sm mr-1">Approve</button></form><form method="POST" action="/admin/deposit/<%= d.id %>/reject" class="inline"><button class="px-3 py-1 bg-red-600 rounded-lg text-sm">Reject</button></form><% } else { %>—<% } %></td></tr><% }); %></tbody></table></div></div>
+      <!-- Stats Summary -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Total Deposits</p>
+          <p class="text-2xl font-bold text-white"><%= deposits.length %></p>
+        </div>
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Pending</p>
+          <p class="text-2xl font-bold text-yellow-400"><%= deposits.filter(d => d.status === 'pending').length %></p>
+        </div>
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Gift Cards</p>
+          <p class="text-2xl font-bold text-purple-400"><%= deposits.filter(d => d.method === 'gift_card' || d.deposit_type === 'giftcard').length %></p>
+        </div>
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Total Value</p>
+          <p class="text-2xl font-bold text-green-400">$<%= deposits.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0).toFixed(2) %></p>
+        </div>
+      </div>
+
+      <!-- Deposits Table -->
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-700/50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">User</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Method</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Gift Card Code</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Proof</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Status</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Date</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% deposits.forEach(function(d) { %>
+                <tr class="border-t border-slate-700 hover:bg-slate-700/30 transition">
+                  <!-- User -->
+                  <td class="px-6 py-4">
+                    <div class="font-medium"><%= d.first_name %> <%= d.last_name %></div>
+                    <span class="text-xs text-slate-400"><%= d.email %></span>
+                  </td>
+                  
+                  <!-- Amount -->
+                  <td class="px-6 py-4 text-right font-mono font-bold">
+                    <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.amount) %>
+                  </td>
+                  
+                  <!-- Method with Badge -->
+                  <td class="px-6 py-4">
+                    <% if (d.method === 'gift_card' || d.deposit_type === 'giftcard') { %>
+                      <span class="px-2 py-1 rounded text-xs badge-giftcard">🎁 Gift Card</span>
+                    <% } else { %>
+                      <span class="px-2 py-1 rounded text-xs badge-deposit"><%= d.method || 'Bank Transfer' %></span>
+                    <% } %>
+                  </td>
+                  
+                  <!-- Gift Card Code -->
+                  <td class="px-6 py-4">
+                    <% if (d.gift_card_code) { %>
+                      <span class="font-mono text-sm bg-slate-700/50 px-2 py-1 rounded"><%= d.gift_card_code %></span>
+                    <% } else { %>
+                      <span class="text-slate-500 text-sm">—</span>
+                    <% } %>
+                  </td>
+                  
+                  <!-- Proof / File -->
+                  <td class="px-6 py-4">
+                    <% if (d.gift_card_file) { %>
+                      <a href="/uploads/giftcards/<%= d.gift_card_file %>" target="_blank" class="text-purple-400 hover:text-purple-300 text-sm flex items-center gap-1">
+                        🎁 View Gift Card
+                      </a>
+                    <% } else if (d.proof_path) { %>
+                      <a href="/uploads/deposits/<%= d.proof_path %>" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                        📎 View Proof
+                      </a>
+                    <% } else { %>
+                      <span class="text-slate-500 text-sm">No file</span>
+                    <% } %>
+                  </td>
+                  
+                  <!-- Status -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="px-2 py-1 rounded text-xs 
+                      <%= d.status === 'approved' ? 'badge-approved' : 
+                         d.status === 'pending' ? 'badge-pending' : 
+                         'badge-rejected' %>">
+                      <%= d.status.toUpperCase() %>
+                    </span>
+                  </td>
+                  
+                  <!-- Date -->
+                  <td class="px-6 py-4 text-center text-sm text-slate-400">
+                    <%= new Date(d.created_at).toLocaleDateString() %>
+                    <br>
+                    <span class="text-xs"><%= new Date(d.created_at).toLocaleTimeString() %></span>
+                  </td>
+                  
+                  <!-- Actions -->
+                  <td class="px-6 py-4 text-center">
+                    <% if(d.status === 'pending') { %>
+                      <div class="flex flex-col gap-1">
+                        <form method="POST" action="/admin/deposit/<%= d.id %>/approve" class="inline">
+                          <button class="px-3 py-1 bg-green-600 rounded-lg text-sm hover:bg-green-700 transition w-full">Approve</button>
+                        </form>
+                        <form method="POST" action="/admin/deposit/<%= d.id %>/reject" class="inline">
+                          <button class="px-3 py-1 bg-red-600 rounded-lg text-sm hover:bg-red-700 transition w-full">Reject</button>
+                        </form>
+                      </div>
+                    <% } else { %>
+                      <span class="text-slate-500 text-sm">Processed</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+              
+              <!-- Empty State -->
+              <% if (deposits.length === 0) { %>
+                <tr>
+                  <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                    <div class="text-4xl mb-3">📭</div>
+                    <p>No deposits found</p>
+                    <p class="text-sm text-slate-500">Deposits will appear here once users submit them</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Legend -->
+      <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
+        <span>📎 = Bank/Crypto Proof</span>
+        <span>🎁 = Gift Card Submission</span>
+        <span class="text-yellow-400">● Pending</span>
+        <span class="text-green-400">● Approved</span>
+        <span class="text-red-400">● Rejected</span>
+      </div>
     </div>
   </div>
 </body>
