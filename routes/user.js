@@ -237,12 +237,11 @@ router.get('/investments', async (req, res) => {
   }
 });
 
-// ==================== NEW INVESTMENT (GET) - FIXED ====================
+// ==================== NEW INVESTMENT (GET) ====================
 router.get('/new-investment', async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
-    // FIX: is_active = true (not = 1) - PostgreSQL BOOLEAN
     const plans = await db.query('SELECT * FROM plans WHERE is_active = true ORDER BY min_amount ASC');
     res.render('dashboard/new-investment', { 
       title: 'New Investment', 
@@ -269,7 +268,6 @@ router.post('/new-investment', async (req, res) => {
       req.flash('error', 'User not found'); 
       return res.redirect('/dashboard/new-investment'); 
     }
-    // FIX: is_active = true (not = 1)
     const plan = await db.query('SELECT * FROM plans WHERE id = $1 AND is_active = true', [plan_id]);
     if (!plan || !plan.rows || plan.rows.length === 0) { 
       req.flash('error', 'Plan not found'); 
@@ -355,7 +353,7 @@ router.get('/deposits', async (req, res) => {
   }
 });
 
-// ==================== DEPOSITS (POST) - FULLY WORKING ====================
+// ==================== DEPOSITS (POST) ====================
 router.post('/deposits', 
   depositUpload.fields([
     { name: 'proof', maxCount: 1 },
@@ -390,7 +388,6 @@ router.post('/deposits',
 
       const isGiftCard = method === 'gift_card' || deposit_type === 'giftcard';
 
-      // Insert with all columns - PostgreSQL syntax
       await db.query(
         `INSERT INTO deposits 
          (user_id, amount, method, proof_path, gift_card_code, gift_card_file, 
@@ -408,14 +405,12 @@ router.post('/deposits',
         ]
       );
 
-      // Create notification - use false for is_read (BOOLEAN)
       await db.query(
         `INSERT INTO notifications (user_id, title, message, is_read, created_at)
          VALUES ($1, $2, $3, false, NOW())`,
         [userId, 'Deposit Requested', `Your ${isGiftCard ? 'gift card' : 'deposit'} of $${amt} is pending confirmation.`]
       );
 
-      // Log activity
       await db.query(
         `INSERT INTO activity_log (user_id, action, type, description, created_at)
          VALUES ($1, $2, $3, $4, NOW())`,
@@ -428,7 +423,6 @@ router.post('/deposits',
     } catch (error) {
       console.error('Deposit error:', error);
       
-      // Clean up uploaded files if database insert fails
       if (req.files) {
         Object.keys(req.files).forEach(key => {
           req.files[key].forEach(file => {
@@ -543,22 +537,29 @@ router.get('/transactions', async (req, res) => {
   }
 });
 
-// ==================== PROFILE ====================
+// ==================== PROFILE - FIXED ====================
 router.get('/profile', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.query(
+    const user = await db.get(
       'SELECT id, first_name, last_name, email, balance, currency, created_at, phone, dob, address, address2, city, state, postal_code, country, kyc_status, referral_code FROM users WHERE id = $1',
       [userId]
     );
-    res.render('dashboard/profile', { title: 'Profile', user: user?.rows[0] || null });
+    
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/dashboard');
+    }
+    
+    res.render('dashboard/profile', { title: 'Profile', user: user });
   } catch (error) {
     console.error('Profile error:', error);
-    res.status(500).send('Error loading profile');
+    req.flash('error', 'Error loading profile: ' + error.message);
+    res.redirect('/dashboard');
   }
 });
 
-// ==================== PROFILE UPDATE (POST) ====================
+// ==================== PROFILE UPDATE (POST) - FIXED ====================
 router.post('/profile/update', async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -581,7 +582,7 @@ router.post('/profile/update', async (req, res) => {
   }
 });
 
-// ==================== CHANGE PASSWORD ====================
+// ==================== CHANGE PASSWORD - FIXED ====================
 router.post('/change-password', async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -596,13 +597,13 @@ router.post('/change-password', async (req, res) => {
       return res.redirect('/dashboard/profile');
     }
 
-    const user = await db.query('SELECT password FROM users WHERE id = $1', [userId]);
-    if (!user || !user.rows || user.rows.length === 0) {
+    const user = await db.get('SELECT password FROM users WHERE id = $1', [userId]);
+    if (!user) {
       req.flash('error', 'User not found');
       return res.redirect('/dashboard/profile');
     }
 
-    const valid = await bcrypt.compare(current_password, user.rows[0].password);
+    const valid = await bcrypt.compare(current_password, user.password);
     if (!valid) {
       req.flash('error', 'Current password is incorrect');
       return res.redirect('/dashboard/profile');
@@ -633,14 +634,14 @@ router.get('/notifications', async (req, res) => {
     const userId = req.session.userId;
     if (!userId) return res.redirect('/signin');
     
-    const user = await db.query('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
+    const user = await db.get('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
     const notifications = await db.query(
       'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
     res.render('dashboard/notifications', {
       title: 'Notifications',
-      user: user?.rows[0] || null,
+      user: user || null,
       notifications: notifications?.rows || []
     });
   } catch (error) {
@@ -713,11 +714,11 @@ router.get('/notifications/load', async (req, res) => {
 router.get('/activity-log', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.query('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
+    const user = await db.get('SELECT id, first_name, last_name, email FROM users WHERE id = $1', [userId]);
     const activities = await db.query('SELECT * FROM activity_log WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50', [userId]);
     res.render('dashboard/activity-log', { 
       title: 'Activity Log', 
-      user: user?.rows[0] || null, 
+      user: user || null, 
       activities: activities?.rows || [] 
     });
   } catch (error) {
@@ -730,8 +731,8 @@ router.get('/activity-log', async (req, res) => {
 router.get('/kyc', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.query('SELECT id, first_name, last_name, email, kyc_status FROM users WHERE id = $1', [userId]);
-    res.render('dashboard/kyc', { title: 'KYC Verification', user: user?.rows[0] || null });
+    const user = await db.get('SELECT id, first_name, last_name, email, kyc_status FROM users WHERE id = $1', [userId]);
+    res.render('dashboard/kyc', { title: 'KYC Verification', user: user || null });
   } catch (error) {
     console.error('KYC error:', error);
     res.render('dashboard/kyc', { title: 'KYC Verification', user: null });
@@ -756,16 +757,15 @@ router.post('/kyc/submit', upload.single('front_document'), async (req, res) => 
   }
 });
 
-// ==================== CALCULATOR - FIXED ====================
+// ==================== CALCULATOR ====================
 router.get('/calculator', async (req, res) => {
   try {
     const userId = req.session.userId;
-    const user = await db.query('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
-    // FIX: is_active = true (not = 1)
+    const user = await db.get('SELECT id, first_name, last_name, email, balance, currency FROM users WHERE id = $1', [userId]);
     const plans = await db.query('SELECT * FROM plans WHERE is_active = true ORDER BY min_amount ASC');
     res.render('dashboard/calculator', { 
       title: 'Investment Calculator', 
-      user: user?.rows[0] || null, 
+      user: user || null, 
       plans: plans?.rows || [] 
     });
   } catch (error) {
@@ -792,9 +792,9 @@ router.post('/api/user/change-password', async (req, res) => {
   try {
     const userId = req.session.userId;
     const { current_password, new_password } = req.body;
-    const user = await db.query('SELECT password FROM users WHERE id = $1', [userId]);
-    if (!user || !user.rows || user.rows.length === 0) return res.status(404).json({ message: 'User not found' });
-    const validPassword = await bcrypt.compare(current_password, user.rows[0].password);
+    const user = await db.get('SELECT password FROM users WHERE id = $1', [userId]);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const validPassword = await bcrypt.compare(current_password, user.password);
     if (!validPassword) return res.status(400).json({ message: 'Current password is incorrect' });
     const hashedPassword = await bcrypt.hash(new_password, 10);
     await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
