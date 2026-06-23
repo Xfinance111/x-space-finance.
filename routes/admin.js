@@ -5,14 +5,19 @@ const db = require('../config/database');
 const fs = require('fs');
 const path = require('path');
 
-// Middleware: check if user is admin
+// routes/admin.js - Line 14 and around
 router.use(async (req, res, next) => {
   if (!req.session.userId) {
     return res.redirect('/signin');
   }
   try {
-    const user = await db.get('SELECT is_admin FROM users WHERE id = ?', [req.session.userId]);
-    if (!user || !user.is_admin) {
+    
+    // NO trailing comma in the query!
+    const user = await db.get(
+      'SELECT is_admin FROM users WHERE id = $1',
+      [req.session.userId]
+    );
+    if (!user || user.is_admin !== 1) {
       return res.status(403).send('Access denied. Admin only.');
     }
     next();
