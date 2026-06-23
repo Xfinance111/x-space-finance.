@@ -48,7 +48,8 @@ router.get('/', async (req, res) => {
 
     const user = await db.get(
       `SELECT id, first_name, last_name, email, balance, currency, 
-              kyc_status, referral_code, email_verified, created_at, is_admin 
+              kyc_status, referral_code, email_verified, created_at, is_admin,
+              COALESCE(realized, 0) as realized
        FROM users WHERE id = ?`,
       [userId]
     );
@@ -81,7 +82,6 @@ router.get('/', async (req, res) => {
     let totalInvested = 0;
     let activeCount = 0;
     let totalExpectedReturn = 0;
-    let realizedReturn = 0;
     let availableBalance = parseFloat(user.balance) || 0;
     let portfolioValue = availableBalance;
 
@@ -98,16 +98,15 @@ router.get('/', async (req, res) => {
       totalExpectedReturn += expected;
     });
 
-    maturedInvestments.forEach(inv => {
-      realizedReturn += parseFloat(inv.total_return || 0);
-    });
+    // Realized returns = admin-adjusted realized + matured returns
+    const maturedReturn = maturedInvestments.reduce((sum, inv) => sum + parseFloat(inv.total_return || 0), 0);
+    const realizedReturn = parseFloat(user.realized || 0) + maturedReturn;
 
     portfolioValue = availableBalance + totalInvested;
 
     // --- Checklist flags ---
     const hasDeposit = await db.get(`SELECT COUNT(*) as count FROM deposits WHERE user_id = ? AND status = 'approved'`, [userId]);
     const hasInvestment = await db.get('SELECT COUNT(*) as count FROM investments WHERE user_id = ?', [userId]);
-    // 🔥 FIX: use !! to convert both boolean and integer to true/false
     const isEmailVerified = !!user.email_verified;
     const isKycVerified = user.kyc_status === 'approved';
 
