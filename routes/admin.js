@@ -323,13 +323,18 @@ router.post('/user/:id/reset-password', async (req, res) => {
   }
 });
 
-// Delete User Account
+// Delete User Account (Admin)
 router.delete('/user/:id/delete', async (req, res) => {
   try {
-    await db.run('DELETE FROM users WHERE id = ?', [req.params.id]);
-    res.json({ success: true });
+    const userId = req.params.id;
+    if (parseInt(userId) === req.session.userId) {
+      return res.status(400).json({ success: false, error: 'Cannot delete your own account' });
+    }
+    await db.run('DELETE FROM users WHERE id = ?', [userId]);
+    res.json({ success: true, message: 'User deleted successfully' });
   } catch (error) { 
-    res.status(500).json({ error: error.message }); 
+    console.error('User delete error:', error);
+    res.status(500).json({ success: false, error: error.message }); 
   }
 });
 
@@ -379,7 +384,6 @@ router.post('/deposit/:id/approve', async (req, res) => {
     await db.run('UPDATE users SET balance = ? WHERE id = ?', [newBalance, deposit.user_id]);
     await db.run('INSERT INTO transactions (user_id, type, amount, balance_after, description, created_at) VALUES (?, "deposit", ?, ?, ?, datetime("now"))', [deposit.user_id, deposit.amount, newBalance, 'Deposit approved']);
     
-    // ✅ INSERT NOTIFICATION FOR DEPOSIT APPROVED
     await db.run(
       `INSERT INTO notifications (user_id, title, message, is_read, type, created_at)
        VALUES (?, 'Deposit Approved', ?, 0, 'deposit', CURRENT_TIMESTAMP)`,
@@ -516,41 +520,6 @@ router.post('/plans/update', async (req, res) => {
   }
 });
 
-router.post('/plans/:id/delete', async (req, res) => {
-  try {
-    await db.run('DELETE FROM plans WHERE id = ?', [req.params.id]);
-    req.flash('info', 'Plan deleted');
-    res.redirect('/admin/plans');
-  } catch (error) { 
-    console.error(error); 
-    res.status(500).send('Error deleting plan: ' + error.message); 
-  }
-});// Delete plan
-router.post('/plans/:id/delete', async (req, res) => {
-  try {
-    await db.run('DELETE FROM plans WHERE id = ?', [req.params.id]);
-    req.flash('success', 'Plan deleted');
-    res.redirect('/admin/plans');
-  } catch (error) {
-    console.error('Delete error:', error);
-    req.flash('error', 'Failed to delete');
-    res.redirect('/admin/plans');
-  }
-});
-
-// Soft delete – set is_active to 0
-router.post('/plans/:id/delete', async (req, res) => {
-  try {
-    await db.run('UPDATE plans SET is_active = 0 WHERE id = ?', [req.params.id]);
-    req.flash('success', 'Plan deactivated successfully');
-    res.redirect('/admin/plans');
-  } catch (error) {
-    console.error('Delete error:', error);
-    req.flash('error', 'Failed to deactivate plan');
-    res.redirect('/admin/plans');
-  }
-});
-
 // Toggle plan active status (soft delete / restore)
 router.post('/plans/:id/toggle', async (req, res) => {
   try {
@@ -568,7 +537,6 @@ router.post('/plans/:id/toggle', async (req, res) => {
 });
 
 // ==================== KYC MANAGEMENT ====================
-// GET – list all KYC submissions (pending, approved, rejected)
 router.get('/kyc', async (req, res) => {
   try {
     const adminUser = await db.get('SELECT id, first_name, last_name, email, is_admin FROM users WHERE id = ?', [req.session.userId]);
@@ -591,7 +559,6 @@ router.get('/kyc', async (req, res) => {
   }
 });
 
-// POST – Approve a KYC submission (from KYC list page)
 router.post('/kyc/:id/approve', async (req, res) => {
   try {
     await db.run('UPDATE users SET kyc_status = "approved" WHERE id = ?', [req.params.id]);
@@ -603,7 +570,6 @@ router.post('/kyc/:id/approve', async (req, res) => {
   }
 });
 
-// POST – Reject a KYC submission (from KYC list page)
 router.post('/kyc/:id/reject', async (req, res) => {
   try {
     await db.run('UPDATE users SET kyc_status = "rejected" WHERE id = ?', [req.params.id]);
@@ -615,7 +581,6 @@ router.post('/kyc/:id/reject', async (req, res) => {
   }
 });
 
-// POST – Update KYC status (alternative endpoint used in some views)
 router.post('/user/:id/kyc-update', async (req, res) => {
   try {
     const { status } = req.body;
@@ -657,6 +622,19 @@ router.get('/logs', async (req, res) => {
   }
 });
 
+// ==================== CLEAR LOGS ====================
+router.post('/logs/clear', async (req, res) => {
+  try {
+    await db.run('DELETE FROM activity_log');
+    req.flash('success', 'All logs cleared successfully');
+    res.redirect('/admin/logs');
+  } catch (error) {
+    console.error('Clear logs error:', error);
+    req.flash('error', 'Failed to clear logs');
+    res.redirect('/admin/logs');
+  }
+});
+
 // ==================== UPLOADED FILES ====================
 router.get('/files', async (req, res) => {
   try {
@@ -679,19 +657,36 @@ router.get('/files', async (req, res) => {
   }
 });
 
-// In routes/admin.js
-router.get('/chat-messages', async (req, res) => {
-  const messages = await db.all('SELECT * FROM chat_messages ORDER BY created_at DESC');
-  res.render('admin/chat-messages', { messages });
+// ==================== DELETE FILE ====================
+router.delete('/files/delete', async (req, res) => {
+  try {
+    const { filePath, fileName, type } = req.body;
+    
+    if (!filePath || !fileName) {
+      return res.status(400).json({ success: false, error: 'Missing file path or name' });
+    }
+
+    const fullPath = path.join(__dirname, '..', 'public', filePath);
+    
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+    }
+
+    if (type === 'kyc') {
+      await db.run('UPDATE users SET kyc_doc = NULL WHERE kyc_doc = ?', [fileName]);
+    }
+
+    res.json({ success: true, message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('File delete error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // ==================== CHAT MESSAGES ====================
 router.get('/chat-messages', async (req, res) => {
   try {
-    // Fetch admin user (for the sidebar)
     const adminUser = await db.get('SELECT id, first_name, last_name, email, is_admin FROM users WHERE id = ?', [req.session.userId]);
-
-    // Fetch all chat messages (latest first)
     const messages = await db.all('SELECT * FROM chat_messages ORDER BY created_at DESC');
 
     res.render('admin/chat-messages', {
