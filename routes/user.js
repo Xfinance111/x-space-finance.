@@ -547,10 +547,10 @@ router.get('/profile', async (req, res) => {
       return res.redirect('/signin');
     }
     
-    // FIX: Use $1 instead of ?
+    // Remove phone if it doesn't exist yet
     const user = await db.get(
       `SELECT id, first_name, last_name, email, balance, currency, 
-              created_at, phone, dob, address, address2, city, state, 
+              created_at, dob, address, address2, city, state, 
               postal_code, country, kyc_status, referral_code 
        FROM users WHERE id = $1`,
       [userId]
@@ -561,7 +561,9 @@ router.get('/profile', async (req, res) => {
       return res.redirect('/dashboard');
     }
     
-    // ✅ RENDER the profile page
+    // Add phone as empty string if not in DB yet
+    user.phone = user.phone || '';
+    
     res.render('dashboard/profile', { 
       title: 'My Profile', 
       user: user,
